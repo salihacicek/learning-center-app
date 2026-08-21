@@ -26,7 +26,7 @@ jobs:
         run: npm ci
 
       - name: Build Angular Project
-        run: npm run build -- --base-href /Microservices-Architecture-Learning/
+        run: npm run build -- --base-href /learning-center-app/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
