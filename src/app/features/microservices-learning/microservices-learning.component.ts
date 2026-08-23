@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 import { NODE_DETAILS, NodeDetail } from '../architecture-schema/node-details.data';
 import { MICROSERVICES_LAYERS, MICROSERVICES_FLOWS } from './data/microservices.data';
+import { ADVANCED_LAYERS, ADVANCED_FLOWS } from './data/advanced-microservices.data';
 
 export interface ChildNode {
   id: string;
@@ -88,8 +89,9 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
   
   activeFlowId = signal<string | null>(null);
 
-  layers = computed(() => MICROSERVICES_LAYERS);
-  flows = computed(() => MICROSERVICES_FLOWS);
+  activeMode = signal<'basic'|'advanced'>('basic');
+  layers = computed(() => this.activeMode() === 'advanced' ? ADVANCED_LAYERS : MICROSERVICES_LAYERS);
+  flows = computed(() => this.activeMode() === 'advanced' ? ADVANCED_FLOWS : MICROSERVICES_FLOWS);
   activeFlowData = computed(() => this.flows().find(f => f.id === this.activeFlowId()) || null);
 
   @ViewChild('boardWrapper') boardWrapper!: ElementRef;
@@ -144,6 +146,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
 
   startLearning() {
     this.showWelcome.set(false);
+    setTimeout(() => { this.scheduleRecalculation(); }, 100);
     // Öğrenmeye başla dendiğinde ekranın üst kısmının (mimarinin) görünmesi için scroll'u sıfırlıyoruz.
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -164,31 +167,47 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     if (prompt?.step === 'main') {
       const lowerCmd = cmd.toLowerCase();
       
-      if (lowerCmd.startsWith('giriş yap') || lowerCmd.startsWith('giris yap') || lowerCmd.startsWith('giris-yap')) {
-        // "giriş yap Saliha Çiçek" şeklinde tek satırda yazılmış olabilir
-        const param = cmd.replace(/^giri[sş][ -]yap/i, '').trim();
+      const isAdvanced = this.activeMode() === 'advanced';
+      
+      if (lowerCmd.startsWith('kayıt ol') || lowerCmd.startsWith('kayit ol') || lowerCmd.startsWith('kayit-ol')) {
+        const param = cmd.replace(/^kay[ıi]t[ -]ol/i, '').trim();
+        const targetFlow = isAdvanced ? 'register-flow' : 'genel-mimari';
+        if (!isAdvanced) {
+          this.consoleHistory.update(h => [...h, { type: 'system', text: 'Bu komut sadece Gelişmiş Mimari modunda geçerlidir.' }]);
+          return;
+        }
         if (param) {
-          this.executeFlowWithParam('giris-yap', param);
+          this.executeFlowWithParam(targetFlow, param);
         } else {
-          this.pendingFlow = 'giris-yap';
+          this.pendingFlow = targetFlow;
+          this.activePrompt.set({ step: 'input1', prefix: 'Kayıt Olacak Kullanıcı:', placeholder: 'Örn: Ayşe Yılmaz' });
+        }
+      } else if (lowerCmd.startsWith('giriş yap') || lowerCmd.startsWith('giris yap') || lowerCmd.startsWith('giris-yap')) {
+        const param = cmd.replace(/^giri[sş][ -]yap/i, '').trim();
+        const targetFlow = isAdvanced ? 'login-flow' : 'giris-yap';
+        if (param) {
+          this.executeFlowWithParam(targetFlow, param);
+        } else {
+          this.pendingFlow = targetFlow;
           this.activePrompt.set({ step: 'input1', prefix: 'Kullanıcı Adınız:', placeholder: 'Örn: Saliha Çiçek' });
         }
-      } else if (lowerCmd.startsWith('profil düzenle') || lowerCmd.startsWith('profil duzenle') || lowerCmd.startsWith('profil-duzenle')) {
-        const param = cmd.replace(/^profil[ -]d[uü]zenle/i, '').trim();
+      } else if (lowerCmd.startsWith('profil düzenle') || lowerCmd.startsWith('profil duzenle') || lowerCmd.startsWith('profil-duzenle') || lowerCmd.startsWith('veri ekle')) {
+        const param = cmd.replace(/^(profil[ -]d[uü]zenle|veri[ -]ekle)/i, '').trim();
+        const targetFlow = isAdvanced ? 'crud-flow' : 'profil-duzenle';
         if (param) {
-          this.executeFlowWithParam('profil-duzenle', param);
+          this.executeFlowWithParam(targetFlow, param);
         } else {
-          this.pendingFlow = 'profil-duzenle';
-          this.activePrompt.set({ step: 'input1', prefix: 'Yeni Ad Soyad:', placeholder: 'Örn: Ali Yılmaz' });
+          this.pendingFlow = targetFlow;
+          this.activePrompt.set({ step: 'input1', prefix: isAdvanced ? 'Eklenecek Veri:' : 'Yeni Ad Soyad:', placeholder: isAdvanced ? 'Örn: Yeni Rapor' : 'Örn: Ali Yılmaz' });
         }
       } else if (lowerCmd === 'genel mimari' || lowerCmd === 'genel-mimari') {
-        // Genel mimaride ekstra parametreye gerek yok, direkt çalıştır.
-        this.executeFlowWithParam('genel-mimari', '');
+        const targetFlow = isAdvanced ? 'genel-mimari-advanced' : 'genel-mimari';
+        this.executeFlowWithParam(targetFlow, '');
       } else if (lowerCmd === 'clear' || lowerCmd === 'temizle' || lowerCmd === 'reset') {
         this.resetConsole();
-        return; // İşlemi kes
+        return;
       } else {
-        this.consoleHistory.update(h => [...h, { type: 'system', text: 'Geçersiz komut. Kullanabileceğiniz komutlar: "genel mimari", "giriş yap", "profil düzenle", "temizle"' }]);
+        this.consoleHistory.update(h => [...h, { type: 'system', text: 'Geçersiz komut. Kullanabileceğiniz komutlar: "genel mimari", ' + (isAdvanced ? '"kayıt ol", ' : '') + '"giriş yap", ' + (isAdvanced ? '"veri ekle"' : '"profil düzenle"') + ', "temizle"' }]);
       }
     } else if (prompt?.step === 'input1') {
       const finalParam = cmd || 'Saliha Çiçek';
@@ -196,9 +215,19 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     }
     
     this.consoleInput = '';
+    this.scrollToBottom();
   }
 
   // YENİ: Hem input ile hem de direkt parametreli çalıştırma
+
+  scrollToBottom() {
+    setTimeout(() => {
+      if (this.consoleBody && this.consoleBody.nativeElement) {
+        this.consoleBody.nativeElement.scrollTop = this.consoleBody.nativeElement.scrollHeight;
+      }
+    }, 50);
+  }
+
   executeFlowWithParam(flowId: string, param: string) {
     if (param) {
       this.consoleHistory.update(h => [...h, { type: 'system', text: `İsteğiniz sunucuya iletiliyor... [Veri: ${param}]` }]);
@@ -222,29 +251,46 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
   }
 
   // Animasyon bitince veya flow seçimi değişince terminali sıfırlamak için eklendi:
-  resetConsole() {
+  
+  switchMode(mode: 'basic' | 'advanced') {
+    this.activeMode.set(mode);
+    this.resetNodePositions();
+    this.resetConsole();
+  }
+
+    resetConsole() {
+    const isAdvanced = this.activeMode() === 'advanced';
+    const commands = isAdvanced 
+      ? '- genel mimari\n- kayıt ol\n- giriş yap\n- veri ekle\n- temizle'
+      : '- genel mimari\n- giriş yap\n- profil düzenle\n- temizle';
+      
     this.consoleHistory.set([
-      { type: 'system', text: 'Sistem hazır.\n\nKullanabileceğiniz İşlemler (Komutlar):\n- genel mimari\n- giriş yap\n- profil düzenle\n- fotoğraf yükle\n- temizle\n\nLütfen bir komut giriniz (örn: "genel mimari")' }
+      { type: 'system', text: 'Sistem hazır.\n\nKullanabileceğiniz İşlemler (Komutlar):\n' + commands + '\n\nLütfen bir komut giriniz (örn: "genel mimari")' }
     ]);
     this.activePrompt.set({ step: 'main', prefix: '>', placeholder: 'Komut yazın...' });
     this.pendingFlow = null;
     this.consoleInput = '';
-    this.activeFlowId.set(null); // Akışı da sıfırla
+    this.activeFlowId.set(null);
+    this.scrollToBottom(); // Akışı da sıfırla
     this.currentDataToken = '';
+    
+    // DOM güncellendikten sonra (has-active-flow class'ı kalktıktan sonra)
+    // okları yeniden hesapla ki kutular hareket ettiyse oklar da doğru yeri göstersin!
+    setTimeout(() => {
+      this.calculateSvgLines();
+    }, 100);
   }
 
   startPositionTracker() {
     if (!this.positionTrackerInterval) {
       this.positionTrackerInterval = setInterval(() => {
-         if (this.activeFlowData()) {
-            this.checkAndRecalculateIfMoved();
-         }
+         this.checkAndRecalculateIfMoved();
       }, 50);
     }
   }
 
   checkAndRecalculateIfMoved() {
-    const flow = this.activeFlowData();
+    const flow = this.activeFlowData() || this.flows()[0];
     if (!flow) return;
     
     let moved = false;
@@ -801,7 +847,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       (box as HTMLElement).style.minHeight = '';
     });
 
-    this.calculateSvgLines();
+    setTimeout(() => this.calculateSvgLines(), 100);
   }
 
   togglePanelMinimize(event: Event) {
@@ -901,7 +947,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     if (!this.boardWrapper?.nativeElement) return;
     
     // Aktif akışa ait svgLines nesnelerini oluştur (Eskiden hep 10 taneydi, şimdi dinamik)
-    const activeFlow = this.activeFlowData();
+    let activeFlow = this.activeFlowData();
     const numberOfSteps = activeFlow ? activeFlow.steps.length : 10;
     
     // Eski ok sayısıyla eşleşmiyorsa okları yeniden oluştur (Eğer 8 adımsa 8 ok oluştur vs.)
@@ -940,7 +986,19 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       };
     };
 
-    if (!activeFlow) { this.svgLines.set([]); return; }
+    const bgFlow = this.flows()[0];
+    let isDrawingBackground = false;
+
+    if (!activeFlow) {
+      if (bgFlow) {
+        activeFlow = bgFlow;
+        isDrawingBackground = true;
+      } else {
+        this.svgLines.set([]);
+        this.groupSvgLines.set([]);
+        return;
+      }
+    }
     
     // 1. TÜM görünür kutuların (obstacle) konumlarını topla
     const allBoxes: {id: string, top: number, bottom: number, left: number, right: number}[] = [];
@@ -1196,7 +1254,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       let lineColor = this.getLineColor(i);
       let markerEnd = `arrowhead-${lineColor.replace('#', '')}`;
 
-      if (i <= this.currentStepIndex() || this.isAnimationFinished()) {
+      if (isDrawingBackground || i <= this.currentStepIndex() || this.isAnimationFinished()) {
         
         // Zıplamayı (Jump) önlemek için: Önceki okun bittiği yer ile bu okun başladığı yeri birleştir.
         let tokenPathD = pathD;
@@ -1210,15 +1268,15 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           id: `${step.fromNodeId}-${step.toNodeId}-${i}`, 
           x1, y1, x2, y2, midX: labelX, labelX, labelY,
           pathD,
-          tokenPathD, // YENİ: Token'ın kayacağı kesintisiz yol
-          label: step.label,
-          subLabel: step.subLabel,
-          active: i === this.currentStepIndex() && !this.isAnimationFinished(),
+          tokenPathD: isDrawingBackground ? pathD : tokenPathD,
+          label: isDrawingBackground ? '' : (step.label ? step.label.replace(/{DATA}/g, this.currentDataToken || 'Veri') : ''),
+          subLabel: isDrawingBackground ? '' : step.subLabel,
+          active: isDrawingBackground ? false : (i === this.currentStepIndex() && !this.isAnimationFinished()),
           isReturn: step.isReturn || false,
-          isDefaultBackground: false,
+          isDefaultBackground: isDrawingBackground,
           stepIndex: i + 1,
-          lineColor,
-          markerEnd
+          lineColor: isDrawingBackground ? '#94a3b8' : lineColor,
+          markerEnd: isDrawingBackground ? 'arrowhead' : markerEnd
         });
       }
     });

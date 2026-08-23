@@ -489,12 +489,7 @@
 }
 
 /* Sönük Arka Plan (Harita) Yazısı */
-.default-label .text-label {
-  background: #f8fafc;
-  color: #cbd5e1;
-  border-color: #e2e8f0;
-  opacity: 0.7;
-}
+
 
 /* ==================================================
    2) KUTULAR VE KOLONLAR (UML / TEKNİK ÇİZİM TARZI)
@@ -504,7 +499,7 @@
   position: relative; 
   display: flex;
   flex-wrap: nowrap; /* Ana sayfada ASLA alt satıra geçmesin, yan yana kalsın */
-  align-items: flex-start; 
+  align-items: stretch; 
   align-content: flex-start; 
   justify-content: center; 
   max-width: 100%; /* Sığması için tüm alanı kullan */
@@ -514,55 +509,49 @@
   padding: 20px 20px 40px 20px; /* Üst ve alt boşluklar daraltıldı */
 }
 
-/* Aktif akış varsa CSS Grid Devreye Girer */
+/* Aktif akış varsa CSS Grid Devreye Girer (2x2 Dairesel Döngü) */
 .schema-board.has-active-flow {
-  padding-top: 60px; /* Oklar için üstten biraz daha boşluk bırak */
-  padding-bottom: 300px; /* Akış varken okların taşmaması için boşluk bırakılır */
-  display: grid;
-  /* Ekrana tam sığması için daha orantılı ve responsive bir yerleşim */
-  grid-template-columns: minmax(280px, 1fr) minmax(320px, 1.2fr) minmax(280px, 1fr); 
-  grid-template-rows: auto auto auto;
-  gap: 40px 60px; /* Dikey ve yatay boşluklar ekrana sığması için optimum seviyeye çekildi */
-  /* 
-    Gateway (Orta Üst)
-    İstemci (Sol Orta) -> Microservice (Tam Orta) -> DB'ler (Sağ Taraf, Row 2-3)
-    Queue (Sol Alt)
-  */
+  padding-top: 60px; 
+  padding-bottom: 300px; 
+  display: grid !important;
+  /* 2 kolonlu layout */
+  grid-template-columns: minmax(300px, 1fr) minmax(300px, 1fr); 
+  grid-template-rows: auto auto;
+  gap: 120px 80px; 
   grid-template-areas:
-    ".          gateway       ."
-    "client     microservice  db"
-    "queue      .             db";
-  align-items: center;
+    "frontend gateway"
+    "database services";
+  align-items: flex-start;
+  justify-items: center;
 }
 
-/* Grid Yerleşimleri (grid-template-areas ile eşleşecek) */
+/* Grid Yerleşimleri (Hem Advanced Hem Basic Mod ID'lerini destekler) */
+.schema-board.has-active-flow #frontend-layer,
 .schema-board.has-active-flow #layer-client {
-  grid-area: client;
-  justify-self: center;
+  grid-area: frontend;
 }
+
+.schema-board.has-active-flow #gateway-layer,
 .schema-board.has-active-flow #layer-gateway {
   grid-area: gateway;
-  justify-self: center;
 }
+
+.schema-board.has-active-flow #services-layer,
 .schema-board.has-active-flow #layer-services {
-  grid-area: microservice;
-  justify-self: center;
+  grid-area: services;
 }
-.schema-board.has-active-flow #layer-broker {
-  grid-area: queue;
-  justify-self: center;
-}
+
+.schema-board.has-active-flow #db-layer,
 .schema-board.has-active-flow #layer-data {
-  grid-area: db;
-  justify-self: center;
-  align-self: stretch; /* Dikeyde row 2 ve 3'ü tamamen kaplasın */
+  grid-area: database;
+}
+
+.schema-board.has-active-flow #message-broker {
+  display: none !important; /* Basit modda aktif akışta queue göstermeyelim, loop'u bozmasın */
 }
 
 /* DB katmanındaki kutuların arasını ekran görüntüsündeki gibi devasa açmak için */
-.schema-board.has-active-flow #layer-data .layer-body {
-  justify-content: space-between;
-  height: 100%;
-}
+
 /* Akış dışı (pasif) kutular sönük ve gri olsun */
 .schema-box.out-of-flow {
   background-color: #f1f5f9 !important; 
@@ -574,6 +563,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  height: 100%;
   background: transparent; 
   border: none; 
   min-width: 0; /* Taşıp scroll yapmasın diye min-width kaldırıldı (Sadece Ana Sayfa) */
@@ -632,11 +622,22 @@
 
 .layer-body {
   padding: 12px;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 24px; /* Boyuna boşluk artırıldı (sayılar rahat sığsın) */
+  gap: 24px;
   position: relative;
+  flex: 1;
 }
+
+/* Sadece Gelişmiş Mimaride Y-Dallanmasını göstermek için */
+.schema-board.mode-advanced .layer-body {
+  gap: 120px;
+  justify-content: center;
+}
+
+
+
 
 /* YENİ: Scrollbar tasarımı */
 .layer-body::-webkit-scrollbar {
@@ -1567,4 +1568,53 @@
 }
 .theme-toggle-floating.is-light:hover {
   background: rgba(15, 23, 42, 0.15);
+}
+
+/* YENI YERLESIM KONTROLLERI (OPTICAL ILLUSION FIX) */
+.schema-page {
+  padding: 30px;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+}
+.architecture-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.board-wrapper {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+}
+.schema-board {
+  max-width: 1400px;
+  width: 100%;
+}
+.console-wrapper {
+  width: 100%;
+  max-width: 1400px;
+  margin: 40px auto 0 auto !important;
+}
+
+/* Kutu boylarini ve kolon genisliklerini sabitleyelim (kullanici begendi) */
+.layer-column {
+  width: 280px !important;
+  flex: 0 0 280px !important;
+  max-width: 280px !important;
+}
+.schema-box {
+  height: 120px !important;
+  min-height: 120px !important;
+}
+.schema-board {
+  gap: 4vw !important;
+}
+.box-title-area, .box-desc, .layer-header {
+  text-align: center !important;
+  align-items: center !important;
 }

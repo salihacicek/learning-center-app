@@ -15,6 +15,13 @@
   </div>
 
   <!-- Üst Araç Çubuğu (Görünüm Değiştirici) -->
+  
+  <!-- MOD SEÇİCİ EKLENDİ -->
+  <div class="mode-tabs" *ngIf="!showWelcome()" style="display: flex; gap: 10px; margin-bottom: 20px; padding-top: 15px; justify-content: center; z-index: 100; position: relative;">
+    <button class="tab-btn" [class.active]="activeMode() === 'basic'" (click)="switchMode('basic')">Basit Mimari (Genel Akış)</button>
+    <button class="tab-btn" [class.active]="activeMode() === 'advanced'" (click)="switchMode('advanced')">Gelişmiş Mimari (Özel Alan)</button>
+  </div>
+
   <div class="schema-toolbar" *ngIf="activeFlowId()">
     <button class="toggle-view-btn" (click)="toggleInactiveNodes()">
       <span class="icon">{{ showInactiveNodes() ? '👁' : '👁‍🗨' }}</span>
@@ -63,7 +70,7 @@
   <div class="board-wrapper" (click)="onBoardClick($event)" [class.has-active-flow]="activeFlowId() !== null">
     
     <!-- ESNEYEN İÇ İÇERİK (Hem Kutuları Hem Okları Tutar) -->
-    <div class="schema-board" #boardWrapper [class.has-active-flow]="activeFlowId() !== null">
+    <div class="schema-board" #boardWrapper [class.has-active-flow]="activeFlowId() !== null" [class.mode-advanced]="activeMode() === 'advanced'">
       
       <!-- SVG OVERLAY: Artık schema-board içinde olduğu için scroll'da kutularla beraber kayar -->
       <svg class="schema-svg-overlay">
@@ -87,11 +94,11 @@
         }
 
         <g *ngFor="let line of svgLines()" class="svg-line-group" 
-           [class.default-bg-line]="line.isDefaultBackground"
+           
            [class.active-line]="line.active && !isAnimationFinished() && !line.isDefaultBackground" 
            [class.return-line]="line.isReturn && !line.isDefaultBackground"
            [class.finished-line]="isAnimationFinished() && !line.isDefaultBackground"
-           [style.opacity]="line.isDefaultBackground ? '0.2' : '1'">
+           [style.opacity]="1">
           
           <!-- Zemin (Açık Mavi/Gri) Çizgi: Her zaman görünür -->
           <path class="static-path"
@@ -102,8 +109,8 @@
           <!-- Hareketli (Renkli) Noktalar veya Sabit Renkli Çizgi -->
           <path class="animated-path"
             [attr.d]="line.pathD"
-            [style.stroke]="!line.isDefaultBackground ? line.lineColor : ''"
-            [attr.marker-end]="!line.isDefaultBackground && line.markerEnd ? 'url(#' + line.markerEnd + ')' : null"
+            [style.stroke]="line.lineColor"
+            [attr.marker-end]="line.isReturn ? 'url(#arrowhead-return)' : 'url(#' + line.markerEnd + ')'"
           />
         </g>
       
@@ -129,19 +136,21 @@
 
       <!-- YENİ: Okların etiketleri SVG dışına çıkarıldı ki z-indexleri kutulardan üstün olsun! -->
       @for (line of svgLines(); track line.id) {
-          <div class="html-line-label"
-               [style.left.px]="line.labelX - 12"
-               [style.top.px]="line.labelY - 12"
-               [class.active-label]="line.active && !isAnimationFinished()" 
-               [class.default-label]="line.isDefaultBackground"
-               [class.return-label]="line.isReturn">
-             <div class="text-label" 
-                  [style.color]="line.lineColor"
-                  [style.border-color]="line.lineColor"
-                  [class.text-active]="!line.isDefaultBackground">
-               {{ line.label }}
-             </div>
-          </div>
+          @if (!line.isDefaultBackground) {
+            <div class="html-line-label"
+                 [style.left.px]="line.labelX - 12"
+                 [style.top.px]="line.labelY - 12"
+                 [class.active-label]="line.active && !isAnimationFinished()" 
+                 [class.default-label]="line.isDefaultBackground"
+                 [class.return-label]="line.isReturn">
+               <div class="text-label" 
+                    [style.color]="line.lineColor"
+                    [style.border-color]="line.lineColor"
+                    [class.text-active]="!line.isDefaultBackground">
+                 {{ line.label }}
+               </div>
+            </div>
+          }
       }
       
       @for (layer of layers(); track layer.id) {
