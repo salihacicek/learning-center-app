@@ -565,6 +565,9 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         if (this.masterTokenAnimator?.nativeElement) {
           (this.masterTokenAnimator.nativeElement as any).beginElement();
         }
+        if (this.parallelTokenAnimator?.nativeElement && this.activeParallelTokenPathD()) {
+          (this.parallelTokenAnimator.nativeElement as any).beginElement();
+        }
       }, 50);
 
     }, 2500); // Her adım 2.5 saniye ekranda kalsın
@@ -1336,7 +1339,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
 
         if (shouldDraw) {
           const idSuffix = step.isParallel ? 'parallel-' : '';
-          const lColor = isDrawingBackground ? '#94a3b8' : (step.isParallel ? '#10b981' : lineColor);
+          const lColor = isDrawingBackground ? '#94a3b8' : (step.isParallel ? this.getLineColor(i + 3) : lineColor);
           const mEnd = isDrawingBackground ? 'arrowhead' : `arrowhead-${lColor.replace('#', '')}`;
           
           let finalLabel = '';
