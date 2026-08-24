@@ -52,12 +52,12 @@ export const ADVANCED_FLOWS: FlowPath[] = [
     id: 'login-flow',
     name: '1. Kullanıcı Giriş Akışı (Authentication - Kimlik Doğrulama)',
     steps: [
-      { fromNodeId: 'client-node', toNodeId: 'gateway-node', label: '1. {DATA} giriş bilgilerini (LoginDTO) gönderir' },
-      { fromNodeId: 'gateway-node', toNodeId: 'identity-service', label: '2. Gateway, LoginDTO\'yu Kimlik Servisine yönlendirir' },
-      { fromNodeId: 'identity-service', toNodeId: 'identity-db', label: '3. Authentication: DB\'de şifre doğrulaması yapılır' },
-      { fromNodeId: 'identity-db', toNodeId: 'identity-service', label: '4. {DATA} bulundu ve kimlik doğrulandı', isReturn: true },
-      { fromNodeId: 'identity-service', toNodeId: 'gateway-node', label: '5. Authorization: Yetkileri içeren Token üretildi', isReturn: true },
-      { fromNodeId: 'gateway-node', toNodeId: 'client-node', label: '6. {DATA} girişi başarılı, Token (AuthResponseDTO) istemciye iletildi', isReturn: true }
+      { fromNodeId: 'client-node', toNodeId: 'gateway-node', label: '1. "{DATA}" giriş isteği gönderir', dtoName: 'LoginDTO' },
+      { fromNodeId: 'gateway-node', toNodeId: 'identity-service', label: '2. Gateway, Giriş isteğini Kimlik Servisine iletir', dtoName: 'LoginDTO' },
+      { fromNodeId: 'identity-service', toNodeId: 'identity-db', label: '3. "{DATA}" için DB\'de şifre doğrulaması yapılır' },
+      { fromNodeId: 'identity-db', toNodeId: 'identity-service', label: '4. Başarılı: "{DATA}" bulundu ve doğrulandı', isReturn: true },
+      { fromNodeId: 'identity-service', toNodeId: 'gateway-node', label: '5. Yetkileri (Authorization) içeren Güvenlik Token\'ı üretildi', isReturn: true, dtoName: 'AuthResponseDTO' },
+      { fromNodeId: 'gateway-node', toNodeId: 'client-node', label: '6. "{DATA}" girişi başarılı, Token istemciye iletildi', isReturn: true, dtoName: 'AuthResponseDTO' }
     ]
   },
   {
