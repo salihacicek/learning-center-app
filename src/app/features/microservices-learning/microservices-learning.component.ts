@@ -593,7 +593,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         }
       }, 50);
 
-    }, 2500); // Her adım 2.5 saniye ekranda kalsın
+    }, 4000); // Her adım 4 saniye ekranda kalsın
   }
 
   onAnimationEnd(stepIndex: number) {
