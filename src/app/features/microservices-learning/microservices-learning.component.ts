@@ -258,9 +258,10 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         this.consoleHistory.update(h => [...h, { type: 'system', text: 'Geçersiz komut. Kullanabileceğiniz komutlar: "genel mimari", ' + (isAdvanced ? '"kayıt ol", ' : '') + '"giriş yap", ' + (isAdvanced ? '"crud işlemi yap"' : '"profil düzenle"') + ', "temizle"' }]);
       }
     } else if (prompt?.step === 'input1') {
-      const finalParam = cmd || 'Saliha Çiçek';
+      let finalParam = cmd;
       
       if (this.pendingFlow === 'crud-flow') {
+         finalParam = finalParam || 'Veri Sil';
          this.consoleHistory.update(h => [...h, { type: 'user', text: finalParam }]);
          this.activePrompt.set({
             step: 'input2',
@@ -271,14 +272,34 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
          this.consoleInput = '';
          this.scrollToBottom();
          return;
+      } else if (this.pendingFlow === 'register-flow') {
+         finalParam = finalParam || 'Saliha Çiçek';
+         this.consoleHistory.update(h => [...h, { type: 'user', text: finalParam }]);
+         this.activePrompt.set({
+            step: 'input2',
+            prefix: 'Yaş:',
+            placeholder: 'Örn: 18',
+            action: finalParam
+         });
+         this.consoleInput = '';
+         this.scrollToBottom();
+         return;
       } else {
+         finalParam = finalParam || 'Saliha Çiçek';
          this.executeFlowWithParam(this.pendingFlow!, finalParam);
       }
     } else if (prompt?.step === 'input2') {
-      const dataParam = cmd || 'Rapor 1';
-      const actionParam = prompt.action || 'İşlem';
-      const combined = `${dataParam} (${actionParam})`;
-      this.executeFlowWithParam(this.pendingFlow!, combined);
+      let finalData = cmd;
+      
+      if (this.pendingFlow === 'crud-flow') {
+         finalData = finalData || 'Rapor 1';
+         const combined = `${finalData} (${prompt.action})`;
+         this.executeFlowWithParam(this.pendingFlow!, combined);
+      } else if (this.pendingFlow === 'register-flow') {
+         finalData = finalData || '18';
+         const combined = `Ad: ${prompt.action}\nYaş: ${finalData}`;
+         this.executeFlowWithParam(this.pendingFlow!, combined);
+      }
     }
     
     this.consoleInput = '';
@@ -1326,7 +1347,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           x2 = to.left;
           y2 = fixedY2;
           
-          let corridorOffset = (i % 6) * 16;
+          let corridorOffset = (loopIndex % 6) * 16;
           let gutterX = Math.min(from.left, to.left) - 40 - corridorOffset;
           
           if (activeFlow.id === 'genel-mimari-advanced' && step.isParallel) {
@@ -1343,7 +1364,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           x2 = to.right;
           y2 = fixedY2;
           
-          let corridorOffset = (i % 6) * 16;
+          let corridorOffset = (loopIndex % 6) * 16;
           const gutterX = Math.max(from.right, to.right) + 40 + corridorOffset;
           
           pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
@@ -1362,7 +1383,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         x2 = goingRight ? to.left : to.right;
         y2 = adjFixedY2;
         
-        let corridorOffset = (i % 6) * 16 * (goingRight ? 1 : -1);
+        let corridorOffset = (loopIndex % 6) * 16 * (goingRight ? 1 : -1);
         const midX = x1 + (x2 - x1) / 2 + corridorOffset;
         pathD = `M ${x1} ${adjFixedY1} L ${midX} ${adjFixedY1} L ${midX} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
         labelX = midX;
@@ -1393,7 +1414,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         // Dikey çizgilerin (özellikle farklı kutulardan gelen dönüş oklarının) üst üste binmesini engellemek için:
         // Hem isReturn'e göre ana şeridi ayırıyoruz, hem de global adım indeksine (i) göre eşsiz bir koridor atıyoruz!
         let corridorOffset = isReturn ? 15 : -15;
-        corridorOffset += ((i % 4) * 16 * (isReturn ? 1 : -1));
+        corridorOffset += ((loopIndex % 6) * 16 * (isReturn ? 1 : -1));
         midX += corridorOffset;
 
         pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
