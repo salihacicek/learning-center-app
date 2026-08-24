@@ -207,14 +207,14 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           this.pendingFlow = targetFlow;
           this.activePrompt.set({ step: 'input1', prefix: 'Kullanıcı Adınız:', placeholder: 'Örn: Saliha Çiçek' });
         }
-      } else if (lowerCmd.startsWith('profil düzenle') || lowerCmd.startsWith('profil duzenle') || lowerCmd.startsWith('profil-duzenle') || lowerCmd.startsWith('veri ekle')) {
-        const param = cmd.replace(/^(profil[ -]d[uü]zenle|veri[ -]ekle)/i, '').trim();
+      } else if (lowerCmd.startsWith('profil düzenle') || lowerCmd.startsWith('profil duzenle') || lowerCmd.startsWith('profil-duzenle') || lowerCmd.startsWith('veri ekle') || lowerCmd.startsWith('crud işlemi yap') || lowerCmd.startsWith('crud islemi yap')) {
+        const param = cmd.replace(/^(profil[ -]d[uü]zenle|veri[ -]ekle|crud i[şs]lemi yap)/i, '').trim();
         const targetFlow = isAdvanced ? 'crud-flow' : 'profil-duzenle';
         if (param) {
           this.executeFlowWithParam(targetFlow, param);
         } else {
           this.pendingFlow = targetFlow;
-          this.activePrompt.set({ step: 'input1', prefix: isAdvanced ? 'Eklenecek Veri:' : 'Yeni Ad Soyad:', placeholder: isAdvanced ? 'Örn: Yeni Rapor' : 'Örn: Ali Yılmaz' });
+          this.activePrompt.set({ step: 'input1', prefix: isAdvanced ? 'Yapmak İstediğiniz İşlem:' : 'Yeni Ad Soyad:', placeholder: isAdvanced ? 'Örn: Veri Ekle, Veri Sil, Güncelle' : 'Örn: Ali Yılmaz' });
         }
       } else if (lowerCmd === 'genel mimari' || lowerCmd === 'genel-mimari') {
         const targetFlow = isAdvanced ? 'genel-mimari-advanced' : 'genel-mimari';
@@ -223,7 +223,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         this.resetConsole();
         return;
       } else {
-        this.consoleHistory.update(h => [...h, { type: 'system', text: 'Geçersiz komut. Kullanabileceğiniz komutlar: "genel mimari", ' + (isAdvanced ? '"kayıt ol", ' : '') + '"giriş yap", ' + (isAdvanced ? '"veri ekle"' : '"profil düzenle"') + ', "temizle"' }]);
+        this.consoleHistory.update(h => [...h, { type: 'system', text: 'Geçersiz komut. Kullanabileceğiniz komutlar: "genel mimari", ' + (isAdvanced ? '"kayıt ol", ' : '') + '"giriş yap", ' + (isAdvanced ? '"crud işlemi yap"' : '"profil düzenle"') + ', "temizle"' }]);
       }
     } else if (prompt?.step === 'input1') {
       const finalParam = cmd || 'Saliha Çiçek';
@@ -277,7 +277,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     resetConsole() {
     const isAdvanced = this.activeMode() === 'advanced';
     const commands = isAdvanced 
-      ? '- genel mimari\n- kayıt ol\n- giriş yap\n- veri ekle\n- temizle'
+      ? '- genel mimari\n- kayıt ol\n- giriş yap\n- crud işlemi yap\n- temizle'
       : '- genel mimari\n- giriş yap\n- profil düzenle\n- temizle';
       
     this.consoleHistory.set([

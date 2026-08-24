@@ -62,16 +62,16 @@ export const ADVANCED_FLOWS: FlowPath[] = [
   },
   {
     id: 'crud-flow',
-    name: '2. Veri Ekleme Akışı (Authorization - Yetkilendirme İşlemi)',
+    name: '2. CRUD İşlemi Akışı (Authorization - Yetkilendirme İşlemi)',
     steps: [
-      { fromNodeId: 'client-node', toNodeId: 'gateway-node', label: '1. "{DATA}" ekleme isteği (Token ile birlikte) gönderilir' },
+      { fromNodeId: 'client-node', toNodeId: 'gateway-node', label: '1. "{DATA}" isteği (Token ile birlikte) gönderilir' },
       { fromNodeId: 'gateway-node', toNodeId: 'identity-service', label: '2. Gateway, Token\'ı doğrulamak için Kimlik Servisine sorar' },
       { fromNodeId: 'identity-service', toNodeId: 'identity-db', label: '3. Kimlik Servisi yetki ve oturum durumunu DB\'den kontrol eder' },
       { fromNodeId: 'identity-db', toNodeId: 'identity-service', label: '4. DB onayı: Kullanıcı aktif ve yetkili', isReturn: true },
       { fromNodeId: 'identity-service', toNodeId: 'gateway-node', label: '5. Kimlik Servisi yetkiyi Gateway\'e bildirir', isReturn: true },
       { fromNodeId: 'gateway-node', toNodeId: 'crud-service', label: '6. Yetki onaylandıktan sonra istek Özel Alan Servisine iletilir' },
-      { fromNodeId: 'crud-service', toNodeId: 'crud-db', label: '7. Özel Alan Servisi veriyi DB\'ye yazar' },
-      { fromNodeId: 'crud-db', toNodeId: 'crud-service', label: '8. "{DATA}" başarıyla kaydedildi', isReturn: true },
+      { fromNodeId: 'crud-service', toNodeId: 'crud-db', label: '7. Özel Alan Servisi "{DATA}" işlemini DB\'de uygular' },
+      { fromNodeId: 'crud-db', toNodeId: 'crud-service', label: '8. "{DATA}" işlemi DB\'de başarıyla tamamlandı', isReturn: true },
       { fromNodeId: 'crud-service', toNodeId: 'gateway-node', label: '9. İşlem sonucu Gateway\'e iletilir', isReturn: true },
       { fromNodeId: 'gateway-node', toNodeId: 'client-node', label: '10. "{DATA}" işlemi tamamlandı (200 OK döndü)', isReturn: true }
     ]
