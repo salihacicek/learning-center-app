@@ -242,7 +242,7 @@
         <span class="history-text" [class.system-text]="msg.type === 'system'">{{ msg.text }}</span>
       </div>
     </div>
-    <div class="console-input-row" *ngIf="activePrompt()">
+    <div class="console-input-row" #inputRow *ngIf="activePrompt()">
       <span class="prompt-prefix">{{ activePrompt()?.prefix }}</span>
       <input type="text" [(ngModel)]="consoleInput" (keyup.enter)="executeCommand(consoleInput)" [placeholder]="activePrompt()?.placeholder" />
       <button (click)="executeCommand(consoleInput)">Gönder</button>

@@ -82,6 +82,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
   svgHeight: number = 0;
   @ViewChild('svgContainer') svgContainer!: ElementRef<SVGElement>;
   @ViewChild('consoleBody') consoleBody!: ElementRef<HTMLDivElement>;
+  @ViewChild('inputRow') inputRow?: ElementRef<HTMLDivElement>;
 
   
   showInactiveNodes = signal(false);
@@ -311,10 +312,15 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
 
   scrollToBottom() {
     setTimeout(() => {
-      if (this.consoleBody && this.consoleBody.nativeElement) {
+      requestAnimationFrame(() => {
+        if (this.consoleBody && this.consoleBody.nativeElement) {
         this.consoleBody.nativeElement.scrollTop = this.consoleBody.nativeElement.scrollHeight;
-      }
-    }, 50);
+        }
+        if (this.inputRow && this.inputRow.nativeElement) {
+          this.inputRow.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      });
+    }, 100);
   }
 
   executeFlowWithParam(flowId: string, param: string) {
@@ -626,6 +632,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         this.stopAnimation();
         this.isAnimationFinished.set(true);
         this.consoleHistory.update(h => [...h, { type: 'system', text: 'İşlem başarıyla tamamlandı!' }]);
+        this.scrollToBottom();
         // Zamanlayıcı kaldırıldı, akış ekranda kalmaya devam edecek, fakat kullanıcı yeni komut girebilsin diye prompt'u açıyoruz:
         this.activePrompt.set({ step: 'main', prefix: '>', placeholder: 'Yeni komut yazın...' });
       } else {
@@ -836,6 +843,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     // ESC tuşuna basıldığında konsolu ve akışı sıfırla
     this.resetConsole();
     this.consoleHistory.update(h => [...h, { type: 'system', text: '>>> SİSTEM SIFIRLANDI (ESC) <<<' }]);
+    this.scrollToBottom();
   }
 
   // YENİ: Çarpışma (Collision) Çözümleme - Blokların üst üste binmesini engeller
