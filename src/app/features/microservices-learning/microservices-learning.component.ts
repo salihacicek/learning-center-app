@@ -1297,15 +1297,16 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           x2 = to.left;
           y2 = fixedY2;
           
-          let gutterX = Math.min(from.left, to.left) - 40 - (fromIdx * 20);
+          let corridorOffset = (i % 6) * 16;
+          let gutterX = Math.min(from.left, to.left) - 40 - corridorOffset;
           
           if (activeFlow.id === 'genel-mimari-advanced' && step.isParallel) {
-             gutterX -= 30; // Paralel geri dönüş okunu biraz daha sola iterek dikeyde üst üste binmesini engelliyoruz
+             gutterX -= 30; // Paralel geri dönüş okunu biraz daha sola it
           }
           
           pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
-          labelX = gutterX + 120; // Dikey çizginin sağ tarafındaki boşluğa al
-          labelY = (y1 + y2) / 2;
+          labelX = gutterX; 
+          labelY = y1 - 25;
         } else {
           // Sağ taraftan bracket (]) çiz
           x1 = from.right;
@@ -1313,11 +1314,12 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           x2 = to.right;
           y2 = fixedY2;
           
-          const gutterX = Math.max(from.right, to.right) + 40 + (fromIdx * 20);
+          let corridorOffset = (i % 6) * 16;
+          const gutterX = Math.max(from.right, to.right) + 40 + corridorOffset;
           
           pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
-          labelX = gutterX - 120; // Dikey çizginin sol tarafındaki boşluğa al
-          labelY = (y1 + y2) / 2;
+          labelX = gutterX; 
+          labelY = y1 - 25;
         }
 
       // 2. Yan Yana Kolonlar (Yatay Bağlantı)
@@ -1331,7 +1333,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         x2 = goingRight ? to.left : to.right;
         y2 = adjFixedY2;
         
-        const midX = x1 + (x2 - x1) / 2 + (fromIdx * 6 * (goingRight ? 1 : -1));
+        let corridorOffset = (i % 6) * 16 * (goingRight ? 1 : -1);
+        const midX = x1 + (x2 - x1) / 2 + corridorOffset;
         pathD = `M ${x1} ${adjFixedY1} L ${midX} ${adjFixedY1} L ${midX} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
         labelX = midX;
         
