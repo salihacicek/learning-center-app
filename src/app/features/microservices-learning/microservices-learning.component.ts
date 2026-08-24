@@ -1317,9 +1317,21 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         
         // midX'i fromIdx'e göre az miktarda kaydır ki çok bitişik kolonlarda ters yöne ok çıkmasın (overshoot engeli)
         const midX = x1 + (x2 - x1) / 2 + (fromIdx * 6 * (goingRight ? 1 : -1));
-        pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
+        pathD = `M ${x1} ${fixedY1} L ${midX} ${fixedY1} L ${midX} ${fixedY2} L ${x2} ${fixedY2}`;
         labelX = midX;
-        labelY = ((y1 + y2) / 2) + (i % 2 === 0 ? -28 : 28); // Çizginin hafif üstüne veya altına kaydırarak çakışmayı önle
+        // Çizginin (okun) yukarıda mı aşağıda mı olduğunu kutuların merkezlerine göre anlıyoruz.
+        // Hangi ok üstteyse etiketi üstte, alttaysa altta kalsın ki birbirlerini çapraz kesmesinler.
+        const avgLineY = (fixedY1 + fixedY2) / 2;
+        const avgBoxY = (from.centerY + to.centerY) / 2;
+        let yOffset = 0;
+        if (avgLineY < avgBoxY - 5) {
+           yOffset = -25; // Ok üstte, etiket de üstte
+        } else if (avgLineY > avgBoxY + 5) {
+           yOffset = 25; // Ok altta, etiket de altta
+        } else {
+           yOffset = goingRight ? -25 : 25; // Tam ortadaysa
+        }
+        labelY = avgLineY + yOffset;
 
       // 3. Uzak Kolonlar veya Çapraz/Wrap bağlantılar (Satır atlayanlar)
       } else {

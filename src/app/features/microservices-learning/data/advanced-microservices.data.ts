@@ -80,12 +80,12 @@ export const ADVANCED_FLOWS: FlowPath[] = [
     id: 'register-flow',
     name: '3. Kullanıcı Kayıt Akışı (Kayıt Kontrol ve Temel Atma)',
     steps: [
-      { fromNodeId: 'client-node', toNodeId: 'gateway-node', label: '1. {DATA} kayıt bilgilerini (RegisterDTO) gönderir' },
-      { fromNodeId: 'gateway-node', toNodeId: 'identity-service', label: '2. Gateway, RegisterDTO\'yu Kimlik Servisine iletir' },
-      { fromNodeId: 'identity-service', toNodeId: 'identity-db', label: '3. Kayıt bilgileri kontrol edilir (Kullanıcı mevcut mu?)' },
-      { fromNodeId: 'identity-db', toNodeId: 'identity-service', label: '4. Başarılı. Authentication (Kimlik Doğrulama) hesabı açıldı', isReturn: true },
-      { fromNodeId: 'identity-service', toNodeId: 'gateway-node', label: '5. Authorization (Yetkilendirme) için varsayılan roller atandı', isReturn: true },
-      { fromNodeId: 'gateway-node', toNodeId: 'client-node', label: '6. {DATA} kaydı tamamlandı (UserResponseDTO döndü)', isReturn: true }
+      { fromNodeId: 'client-node', toNodeId: 'gateway-node', label: '1. "{DATA}" kayıt bilgilerini (RegisterDTO) gönderir' },
+      { fromNodeId: 'gateway-node', toNodeId: 'identity-service', label: '2. Gateway, Kayıt isteğini Kimlik Servisine iletir' },
+      { fromNodeId: 'identity-service', toNodeId: 'identity-db', label: '3. "{DATA}" için kullanıcı varlığı kontrol edilir' },
+      { fromNodeId: 'identity-db', toNodeId: 'identity-service', label: '4. Başarılı: "{DATA}" için Kimlik (Authentication) oluşturuldu', isReturn: true },
+      { fromNodeId: 'identity-service', toNodeId: 'gateway-node', label: '5. "{DATA}" için varsayılan yetkiler (Authorization) atandı', isReturn: true },
+      { fromNodeId: 'gateway-node', toNodeId: 'client-node', label: '6. "{DATA}" kaydı tamamlandı (201 Created)', isReturn: true }
     ]
   }
 ];
