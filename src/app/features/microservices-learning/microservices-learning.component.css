@@ -512,7 +512,9 @@
 /* Aktif akış varsa CSS Grid Devreye Girer (2x2 Dairesel Döngü) */
 .schema-board.has-active-flow {
   padding-top: 60px; 
-  padding-bottom: 300px; 
+  padding-bottom: 300px;
+  padding-right: 400px; /* Sagdaki aciklama etiketlerinin sayfadan tasmamasi icin */
+  padding-right: 400px; /* Sagdaki aciklama etiketlerinin sayfadan tasmamasi icin */ 
   display: grid !important;
   /* 2 kolonlu layout */
   grid-template-columns: minmax(300px, 1fr) minmax(300px, 1fr); 
