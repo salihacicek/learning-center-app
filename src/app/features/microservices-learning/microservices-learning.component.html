@@ -115,6 +115,25 @@
         </g>
       
         <!-- YENİ: Tek Bir SVG Token (DOM'dan silinip eklenmez, flash yapmaz) -->
+        <!-- İKİNCİ PARALEL TOKEN (Gelişmiş Genel Mimari için) -->
+        <g *ngIf="activeParallelTokenPathD()" class="data-token-group">
+          <g>
+            <line x1="0" y1="0" x2="0" y2="30" stroke="#10b981" stroke-width="2" />
+            <rect x="-60" y="30" width="120" height="26" rx="6" fill="#ffffff" stroke="#10b981" stroke-width="1.5" style="filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.15));" />
+            <text x="0" y="47" font-size="12" font-weight="600" fill="#1e293b" text-anchor="middle" font-family="'Inter', sans-serif">
+              {{ currentDataToken || 'Veri' }}
+            </text>
+            <circle cx="0" cy="0" r="8" fill="#34d399" stroke="#10b981" stroke-width="2" style="filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.2));" />
+            <circle cx="0" cy="0" r="3" fill="#ffffff" />
+          </g>
+          <animateMotion #parallelTokenAnimator
+            [attr.path]="activeParallelTokenPathD()"
+            dur="2.5s"
+            repeatCount="1"
+            fill="freeze"
+          />
+        </g>
+        
         <g *ngIf="activeTokenPathD()" class="data-token-group">
           <g>
             <line x1="0" y1="0" x2="0" y2="30" stroke="#f59e0b" stroke-width="2" />

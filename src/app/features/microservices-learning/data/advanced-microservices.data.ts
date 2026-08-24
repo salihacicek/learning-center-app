@@ -40,11 +40,12 @@ export const ADVANCED_FLOWS: FlowPath[] = [
     id: 'genel-mimari-advanced',
     name: 'Gelişmiş Mimari Genel Yapı',
     steps: [
-      { fromNodeId: 'client-node', toNodeId: 'gateway-node', label: '1. İstemciden İstek Gelir' },
-      { fromNodeId: 'gateway-node', toNodeId: 'identity-service', label: '2. Kimlik/Oturum Kontrolü' },
-      { fromNodeId: 'identity-service', toNodeId: 'identity-db', label: '3. Kimlik DB Sorgusu' },
-      { fromNodeId: 'gateway-node', toNodeId: 'crud-service', label: '4. Veri (CRUD) İşlemleri' },
-      { fromNodeId: 'crud-service', toNodeId: 'crud-db', label: '5. Özel Alan DB Kaydı' }
+      { fromNodeId: 'client-node', toNodeId: 'gateway-node', label: '1. Çoklu Kullanıcı İstekleri Gelir' },
+      { fromNodeId: 'gateway-node', toNodeId: 'identity-service', parallelNodeFrom: 'gateway-node', parallelNodeTo: 'crud-service', label: '2. Gateway İstekleri Dağıtır' },
+      { fromNodeId: 'identity-service', toNodeId: 'identity-db', parallelNodeFrom: 'crud-service', parallelNodeTo: 'crud-db', label: '3. Servisler Veritabanlarına Bağlanır' },
+      { fromNodeId: 'identity-db', toNodeId: 'identity-service', parallelNodeFrom: 'crud-db', parallelNodeTo: 'crud-service', label: '4. İşlemler Gerçekleşir', isReturn: true },
+      { fromNodeId: 'identity-service', toNodeId: 'gateway-node', parallelNodeFrom: 'crud-service', parallelNodeTo: 'gateway-node', label: '5. Sonuçlar Gateway\'de Toplanır', isReturn: true },
+      { fromNodeId: 'gateway-node', toNodeId: 'client-node', label: '6. Yanıtlar Kullanıcıya İletilir', isReturn: true }
     ]
   },
   {

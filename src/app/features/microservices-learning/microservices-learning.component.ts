@@ -35,6 +35,8 @@ export interface FlowStep {
   subLabel?: string;
   isReturn?: boolean; 
   isDefaultBackground?: boolean; 
+  parallelNodeFrom?: string;
+  parallelNodeTo?: string;
 }
 
 export interface FlowPath {
@@ -62,6 +64,7 @@ export interface SvgLine {
   stepIndex: number;
   lineColor?: string;
   markerEnd?: string;
+  parallelTokenPathD?: string;
 }
 
 @Component({
@@ -124,13 +127,25 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     return this.sanitizer.bypassSecurityTrustStyle(`offset-path: path('${pathD}');`);
   }
 
-  activeTokenPathD(): string | null {
+    activeTokenPathD(): string | null {
+    if (this.isAnimationFinished()) return null;
+    const lines = this.svgLines();
+    const activeLine = lines.find(l => l.active && !l.isDefaultBackground && !l.parallelTokenPathD);
+    return activeLine?.tokenPathD || null;
+  }
+
+  activeParallelTokenPathD(): string | null {
     if (this.isAnimationFinished()) return null;
     const flow = this.activeFlowData();
-    if (!flow) return null;
+    if (!flow || flow.id !== 'genel-mimari-advanced') return null;
+    
     const lines = this.svgLines();
-    const activeLine = lines.find(l => l.active && !l.isDefaultBackground);
-    return activeLine?.tokenPathD || null;
+    const parallelLine = lines.find(l => l.active && !l.isDefaultBackground && l.parallelTokenPathD);
+    
+    const idx = this.currentStepIndex();
+    if (idx === 0 || idx === 5) return null;
+    
+    return parallelLine?.parallelTokenPathD || null;
   }
 
   ngOnInit() {
@@ -434,6 +449,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     flow.steps.forEach(s => {
       activeNodeIds.add(s.fromNodeId);
       activeNodeIds.add(s.toNodeId);
+      if (s.parallelNodeFrom) activeNodeIds.add(s.parallelNodeFrom);
+      if (s.parallelNodeTo) activeNodeIds.add(s.parallelNodeTo);
     });
 
     let changed = false;
@@ -631,7 +648,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     if (!flowId) return true; 
     const flow = this.flows().find(f => f.id === flowId);
     if (!flow) return true;
-    return flow.steps.some(s => s.fromNodeId === nodeId || s.toNodeId === nodeId);
+    return flow.steps.some(s => s.fromNodeId === nodeId || s.toNodeId === nodeId || s.parallelNodeFrom === nodeId || s.parallelNodeTo === nodeId);
   }
 
   isNodeHighlighted(nodeId: string): boolean {
@@ -646,7 +663,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     if (currentIndex === -1) return false;
     
     const step = flow.steps[currentIndex];
-    return step.fromNodeId === nodeId || step.toNodeId === nodeId;
+    return step.fromNodeId === nodeId || step.toNodeId === nodeId || step.parallelNodeFrom === nodeId || step.parallelNodeTo === nodeId;
   }
 
   openNodeDetails(nodeId: string) {
@@ -1032,7 +1049,45 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     const edgeTotal = new Map<string, number>(); // key: 'nodeId-left' or 'nodeId-right'
     const stepEdges = new Map<number, { fromEdge: 'left'|'right', toEdge: 'left'|'right' }>();
 
+    interface DrawRoute {
+      fromNodeId: string;
+      toNodeId: string;
+      label: string;
+      isReturn: boolean;
+      originalIndex: number;
+      isParallel: boolean;
+    }
+    
+    const drawRoutes: DrawRoute[] = [];
     activeFlow.steps.forEach((step, i) => {
+      drawRoutes.push({
+         fromNodeId: step.fromNodeId,
+         toNodeId: step.toNodeId,
+         label: step.label,
+         isReturn: step.isReturn || false,
+         originalIndex: i,
+         isParallel: false
+      });
+      if (activeFlow.id === 'genel-mimari-advanced' && i >= 1 && i <= 4) {
+         let pFromId = ''; let pToId = ''; let pLabel = '';
+         if (i === 1) { pFromId = 'gateway-node'; pToId = 'crud-service'; pLabel = 'Özel Alana Yönlendirme'; }
+         if (i === 2) { pFromId = 'crud-service'; pToId = 'crud-db'; pLabel = 'Özel Alan DB İşlemi'; }
+         if (i === 3) { pFromId = 'crud-db'; pToId = 'crud-service'; pLabel = 'Özel Alan Dönüşü'; }
+         if (i === 4) { pFromId = 'crud-service'; pToId = 'gateway-node'; pLabel = 'Özel Alan Sonucu'; }
+         
+         drawRoutes.push({
+            fromNodeId: pFromId,
+            toNodeId: pToId,
+            label: pLabel,
+            isReturn: (i === 3 || i === 4),
+            originalIndex: i,
+            isParallel: true
+         });
+      }
+    });
+
+    drawRoutes.forEach((step, loopIndex) => {
+      const i = step.originalIndex;
       const elFrom = document.getElementById(step.fromNodeId);
       const elTo = document.getElementById(step.toNodeId);
       if (!elFrom || !elTo) return;
@@ -1066,7 +1121,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         toEdge = goingRight ? 'left' : 'right';
       }
 
-      stepEdges.set(i, { fromEdge, toEdge });
+      stepEdges.set(loopIndex, { fromEdge, toEdge });
 
       const fromKey = `${step.fromNodeId}-${fromEdge}`;
       const toKey = `${step.toNodeId}-${toEdge}`;
@@ -1126,8 +1181,9 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     let topCorridorCount = 0;
     let bottomCorridorCount = 0;
 
-    activeFlow.steps.forEach((step, i) => {
-      const edges = stepEdges.get(i);
+    drawRoutes.forEach((step, loopIndex) => {
+      const i = step.originalIndex;
+      const edges = stepEdges.get(loopIndex);
       if (!edges) return;
 
       const elFrom = document.getElementById(step.fromNodeId);
@@ -1264,20 +1320,36 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           tokenPathD = pathD.replace(`M ${x1} ${y1}`, `M ${prevStep.x2} ${prevStep.y2} L ${x1} ${y1}`);
         }
 
-        newLines.push({
-          id: `${step.fromNodeId}-${step.toNodeId}-${i}`, 
-          x1, y1, x2, y2, midX: labelX, labelX, labelY,
-          pathD,
-          tokenPathD: isDrawingBackground ? pathD : tokenPathD,
-          label: isDrawingBackground ? '' : (step.label ? step.label.replace(/{DATA}/g, this.currentDataToken || 'Veri') : ''),
-          subLabel: isDrawingBackground ? '' : step.subLabel,
-          active: isDrawingBackground ? false : (i === this.currentStepIndex() && !this.isAnimationFinished()),
-          isReturn: step.isReturn || false,
-          isDefaultBackground: isDrawingBackground,
-          stepIndex: i + 1,
-          lineColor: isDrawingBackground ? '#94a3b8' : lineColor,
-          markerEnd: isDrawingBackground ? 'arrowhead' : markerEnd
-        });
+        const isParallelActive = !isDrawingBackground && (i === this.currentStepIndex() && !this.isAnimationFinished());
+        const activeStatus = isDrawingBackground ? false : (i === this.currentStepIndex() && !this.isAnimationFinished());
+        const shouldDraw = isDrawingBackground || activeStatus;
+
+        if (shouldDraw) {
+          const idSuffix = step.isParallel ? 'parallel-' : '';
+          const lColor = isDrawingBackground ? '#94a3b8' : (step.isParallel ? '#10b981' : lineColor);
+          const mEnd = isDrawingBackground ? 'arrowhead' : `arrowhead-${lColor.replace('#', '')}`;
+          
+          let finalLabel = '';
+          if (!isDrawingBackground) {
+             finalLabel = step.label ? step.label.replace(/{DATA}/g, this.currentDataToken || 'Veri') : '';
+          }
+
+          newLines.push({
+            id: `${idSuffix}${step.fromNodeId}-${step.toNodeId}-${i}`, 
+            x1, y1, x2, y2, midX: labelX, labelX, labelY,
+            pathD,
+            tokenPathD: isDrawingBackground ? pathD : tokenPathD,
+            label: finalLabel,
+            subLabel: isDrawingBackground ? '' : (step as any).subLabel,
+            active: activeStatus,
+            isReturn: step.isReturn || false,
+            isDefaultBackground: isDrawingBackground,
+            stepIndex: i + 1,
+            lineColor: lColor,
+            markerEnd: mEnd,
+            parallelTokenPathD: step.isParallel ? pathD : undefined
+          });
+        }
       }
     });
 
