@@ -1366,9 +1366,11 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
 
         pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
         
-        // Etiketlerin blokların üstüne gelmemesi için yatayda midX'i, dikeyde ise ortalamayı kullanıp i'ye göre kaydırıyoruz
+        // Etiketlerin blokların üstüne gelmemesi için yatayda midX'i kullanıyoruz.
+        // Dikeyde (Y) ise okun başladığı yatay çizginin hemen üstüne (y1 - 25) yerleştiriyoruz ki 
+        // gidiş-dönüş oklarında açıklamalar birbirine karışmasın!
         labelX = midX;
-        labelY = ((y1 + y2) / 2) + ((i % 2 === 0) ? 45 : -45);
+        labelY = y1 - 25;
       }
 
       // 3. Adım: Hangi okun hangi renk olacağını ve dönüş mü gidiş mi olduğunu belirle
