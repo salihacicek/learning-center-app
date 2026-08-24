@@ -33,7 +33,8 @@ export interface FlowStep {
   toNodeId: string;
   label: string;
   subLabel?: string;
-  isReturn?: boolean; 
+  dtoName?: string;
+  isReturn?: boolean;
   isDefaultBackground?: boolean; 
   parallelNodeFrom?: string;
   parallelNodeTo?: string;
@@ -58,6 +59,7 @@ export interface SvgLine {
   tokenPathD?: string;
   label: string;
   subLabel?: string;
+  dtoName?: string;
   active: boolean; 
   isReturn: boolean; 
   isDefaultBackground: boolean; 
@@ -111,6 +113,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
 
   // YENİ: Token Animasyonu İçin Veri
   currentDataToken: string = '';
+  currentDtoName = signal<string | null>(null);
 
   positionTrackerInterval: any;
   private lastElementPositions = new Map<string, string>();
@@ -308,6 +311,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     this.activeFlowId.set(null);
     this.scrollToBottom(); // Akışı da sıfırla
     this.currentDataToken = '';
+    this.currentDtoName.set(null);
     
     // DOM güncellendikten sonra (has-active-flow class'ı kalktıktan sonra)
     // okları yeniden hesapla ki kutular hareket ettiyse oklar da doğru yeri göstersin!
