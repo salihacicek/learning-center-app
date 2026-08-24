@@ -1313,8 +1313,9 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         // Kutuların arasındaki dikey boşluktan inebilmek için:
         let midX = (x1 + x2) / 2;
         
-        // Üst üste binmesini önlemek için jitter ekle
-        midX += (fromIdx * 10 * (goingRight ? 1 : -1));
+        // İleri ve geri (return) okları birbirinden HESAPLI bir şekilde ayırarak çapraz kesişmelerini KÖKÜNDEN önlüyoruz
+        midX += (isReturn ? 30 : -30);
+        midX += (fromIdx * 8 * (isReturn ? 1 : -1));
 
         pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
         
