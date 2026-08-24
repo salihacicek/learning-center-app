@@ -84,7 +84,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
   consoleHistory = signal<{ type: 'system' | 'user', text: string }[]>([
     { type: 'system', text: 'Sistem hazır.\n\nKullanabileceğiniz İşlemler (Komutlar):\n- genel mimari\n- giriş yap\n- profil düzenle\n\nLütfen bir komut giriniz (örn: "genel mimari")' }
   ]);
-  activePrompt = signal<{ step: string, prefix: string, placeholder: string } | null>({ step: 'main', prefix: '>', placeholder: 'Komut yazın...' });
+  activePrompt = signal<{ step: string, prefix: string, placeholder: string, action?: string } | null>({ step: 'main', prefix: '>', placeholder: 'Komut yazın...' });
   pendingFlow: string | null = null;
 
   showWelcome = signal(true);
@@ -227,7 +227,26 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       }
     } else if (prompt?.step === 'input1') {
       const finalParam = cmd || 'Saliha Çiçek';
-      this.executeFlowWithParam(this.pendingFlow!, finalParam);
+      
+      if (this.pendingFlow === 'crud-flow') {
+         this.consoleHistory.update(h => [...h, { type: 'user', text: finalParam }]);
+         this.activePrompt.set({
+            step: 'input2',
+            prefix: 'İşlem Yapılacak Veri:',
+            placeholder: 'Örn: Rapor 1, Eski Kayıt',
+            action: finalParam
+         });
+         this.consoleInput = '';
+         this.scrollToBottom();
+         return;
+      } else {
+         this.executeFlowWithParam(this.pendingFlow!, finalParam);
+      }
+    } else if (prompt?.step === 'input2') {
+      const dataParam = cmd || 'Rapor 1';
+      const actionParam = prompt.action || 'İşlem';
+      const combined = `${dataParam} (${actionParam})`;
+      this.executeFlowWithParam(this.pendingFlow!, combined);
     }
     
     this.consoleInput = '';
