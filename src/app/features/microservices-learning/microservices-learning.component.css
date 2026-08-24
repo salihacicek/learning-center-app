@@ -519,7 +519,7 @@
   /* 2 kolonlu layout */
   grid-template-columns: minmax(300px, 1fr) minmax(300px, 1fr); 
   grid-template-rows: auto auto;
-  gap: 120px 80px; 
+  gap: 120px 320px; 
   grid-template-areas:
     "frontend gateway"
     "database services";
