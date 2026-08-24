@@ -1053,7 +1053,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     });
 
     // 3. Kenar Kullanım Sayımlarını Belirle (Okların üst üste binmesini engeller)
-    const edgeTotal = new Map<string, number>(); // key: 'nodeId-left' or 'nodeId-right'
+    const edgeConnections = new Map<string, { id: number, type: 'from'|'to', oppositeY: number }[]>();
     const stepEdges = new Map<number, { fromEdge: 'left'|'right', toEdge: 'left'|'right' }>();
 
     interface DrawRoute {
@@ -1133,8 +1133,16 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       const fromKey = `${step.fromNodeId}-${fromEdge}`;
       const toKey = `${step.toNodeId}-${toEdge}`;
       
-      edgeTotal.set(fromKey, (edgeTotal.get(fromKey) || 0) + 1);
-      edgeTotal.set(toKey, (edgeTotal.get(toKey) || 0) + 1);
+      if (!edgeConnections.has(fromKey)) edgeConnections.set(fromKey, []);
+      edgeConnections.get(fromKey)!.push({ id: loopIndex, type: 'from', oppositeY: to.centerY });
+
+      if (!edgeConnections.has(toKey)) edgeConnections.set(toKey, []);
+      edgeConnections.get(toKey)!.push({ id: loopIndex, type: 'to', oppositeY: from.centerY });
+    });
+
+    // Düğümleri (çizgilerin sırasını) karşı taraftaki kutunun Y koordinatına göre sırala ki oklar çapraz kesişmesin!
+    edgeConnections.forEach((connections) => {
+      connections.sort((a, b) => a.oppositeY - b.oppositeY);
     });
 
     // 4. Kutu Boylarını (min-height) Kenardaki Gerçek Ok Sayısına Göre Büyüt
@@ -1143,8 +1151,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       const htmlEl = el as HTMLElement;
       const id = htmlEl.id;
       if (id) {
-        const leftTotal = edgeTotal.get(`${id}-left`) || 0;
-        const rightTotal = edgeTotal.get(`${id}-right`) || 0;
+        const leftTotal = edgeConnections.get(`${id}-left`)?.length || 0;
+        const rightTotal = edgeConnections.get(`${id}-right`)?.length || 0;
         const maxConns = Math.max(leftTotal, rightTotal);
         // Her bağlantı 36px mesafe gerektirir
         const reqHeight = Math.max(60, maxConns * 36 + 20); 
@@ -1179,7 +1187,6 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       if (box.right > globalRight) globalRight = box.right;
     });
 
-    const edgeCurrent = new Map<string, number>();
     const pairCount = new Map<string, number>();
 
     const newLines: SvgLine[] = [];
@@ -1204,14 +1211,13 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       const fromKey = `${step.fromNodeId}-${edges.fromEdge}`;
       const toKey = `${step.toNodeId}-${edges.toEdge}`;
       
-      const fromTotal = edgeTotal.get(fromKey) || 1;
-      const toTotal = edgeTotal.get(toKey) || 1;
+      const fromList = edgeConnections.get(fromKey) || [];
+      const fromIdx = fromList.findIndex(c => c.id === loopIndex && c.type === 'from') + 1 || 1;
+      const fromTotal = fromList.length || 1;
 
-      const fromIdx = (edgeCurrent.get(fromKey) || 0) + 1;
-      const toIdx = (edgeCurrent.get(toKey) || 0) + 1;
-      
-      edgeCurrent.set(fromKey, fromIdx);
-      edgeCurrent.set(toKey, toIdx);
+      const toList = edgeConnections.get(toKey) || [];
+      const toIdx = toList.findIndex(c => c.id === loopIndex && c.type === 'to') + 1 || 1;
+      const toTotal = toList.length || 1;
 
       const pairKey = `${step.fromNodeId}>${step.toNodeId}`;
       const pairIdx = (pairCount.get(pairKey) || 0);
