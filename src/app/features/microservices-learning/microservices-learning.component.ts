@@ -993,8 +993,17 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
   private calculateSvgLines() {
     if (!this.boardWrapper?.nativeElement) return;
     
-    // Aktif akışa ait svgLines nesnelerini oluştur (Eskiden hep 10 taneydi, şimdi dinamik)
     let activeFlow = this.activeFlowData();
+    
+    // YENİ: DTO Adını Animasyon Token'ına Aktarma
+    if (activeFlow && this.currentStepIndex() >= 0 && this.currentStepIndex() < activeFlow.steps.length) {
+      this.currentDtoName.set((activeFlow.steps[this.currentStepIndex()] as any).dtoName || null);
+    } else {
+      this.currentDtoName.set(null);
+    }
+    
+    // Aktif akışa ait svgLines nesnelerini oluştur (Eskiden hep 10 taneydi, şimdi dinamik)
+
     const numberOfSteps = activeFlow ? activeFlow.steps.length : 10;
     
     // Eski ok sayısıyla eşleşmiyorsa okları yeniden oluştur (Eğer 8 adımsa 8 ok oluştur vs.)
