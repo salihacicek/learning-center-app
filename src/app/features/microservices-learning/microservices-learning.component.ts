@@ -1078,6 +1078,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     
     if (!this.boardWrapper) return;
     const wrapper = this.boardWrapper.nativeElement;
+    this.svgWidth = wrapper.scrollWidth;
+    this.svgHeight = wrapper.scrollHeight;
     const wrapperRect = wrapper.getBoundingClientRect();
     
     const getOffset = (el: HTMLElement) => {
