@@ -1377,9 +1377,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       // 2. Yan Yana Kolonlar (Yatay Bağlantı)
       } else if (isAdjacent && Math.abs(dy) < 150) {
         // Zıt yönlü (gidiş/dönüş) çizgilerin birbirini kesmesini önlemek için dikey ofset (sapma) ekliyoruz.
-        const corridorOffset = (loopIndex % 3) * 12; // Aynı yönde gidenleri ayırmak için
-        let adjFixedY1 = fixedY1 + (goingRight ? -18 : 18) + corridorOffset;
-        let adjFixedY2 = fixedY2 + (goingRight ? -18 : 18) + corridorOffset;
+        let adjFixedY1 = fixedY1 + (goingRight ? -18 : 18);
+        let adjFixedY2 = fixedY2 + (goingRight ? -18 : 18);
 
         x1 = goingRight ? from.right : from.left;
         y1 = adjFixedY1;
@@ -1404,9 +1403,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
 
       // 3. Uzak Kolonlar veya Çapraz/Wrap bağlantılar (Satır atlayanlar)
       } else {
-        const corridorOffset = (loopIndex % 3) * 12; 
-        let adjFixedY1 = fixedY1 + (goingRight ? -18 : 18) + corridorOffset;
-        let adjFixedY2 = fixedY2 + (goingRight ? -18 : 18) + corridorOffset;
+        let adjFixedY1 = fixedY1 + (goingRight ? -18 : 18);
+        let adjFixedY2 = fixedY2 + (goingRight ? -18 : 18);
 
         // Çapraz veya alt satıra geçişlerde doğrudan orta noktadan (basit Z-şekli) bağla
         x1 = goingRight ? from.right : from.left;
