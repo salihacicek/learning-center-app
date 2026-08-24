@@ -273,7 +273,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
             action: finalParam
          });
          this.consoleInput = '';
-         this.scrollToBottom();
+         this.scrollToBottom(); // scroll page to input
          return;
       } else if (this.pendingFlow === 'register-flow') {
          finalParam = finalParam || 'Saliha Çiçek';
@@ -284,7 +284,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
             action: finalParam
          });
          this.consoleInput = '';
-         this.scrollToBottom();
+         this.scrollToBottom(); // scroll page to input
          return;
       } else {
          finalParam = finalParam || 'Saliha Çiçek';
@@ -305,18 +305,18 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     }
     
     this.consoleInput = '';
-    this.scrollToBottom();
+    this.scrollToBottom(); // scroll page to input
   }
 
   // YENİ: Hem input ile hem de direkt parametreli çalıştırma
 
-  scrollToBottom() {
+  scrollToBottom(skipPageScroll: boolean = false) {
     setTimeout(() => {
       requestAnimationFrame(() => {
         if (this.consoleBody && this.consoleBody.nativeElement) {
         this.consoleBody.nativeElement.scrollTop = this.consoleBody.nativeElement.scrollHeight;
         }
-        if (this.inputRow && this.inputRow.nativeElement) {
+        if (!skipPageScroll && this.inputRow && this.inputRow.nativeElement) {
           this.inputRow.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
       });
@@ -366,7 +366,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     this.pendingFlow = null;
     this.consoleInput = '';
     this.activeFlowId.set(null);
-    this.scrollToBottom(); // Akışı da sıfırla
+    this.scrollToBottom(true); // Akışı da sıfırla
     this.currentDataToken = '';
     this.currentDtoName.set(null);
     
@@ -632,7 +632,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         this.stopAnimation();
         this.isAnimationFinished.set(true);
         this.consoleHistory.update(h => [...h, { type: 'system', text: 'İşlem başarıyla tamamlandı!' }]);
-        this.scrollToBottom();
+        this.scrollToBottom(true);
         // Zamanlayıcı kaldırıldı, akış ekranda kalmaya devam edecek, fakat kullanıcı yeni komut girebilsin diye prompt'u açıyoruz:
         this.activePrompt.set({ step: 'main', prefix: '>', placeholder: 'Yeni komut yazın...' });
       } else {
@@ -843,7 +843,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     // ESC tuşuna basıldığında konsolu ve akışı sıfırla
     this.resetConsole();
     this.consoleHistory.update(h => [...h, { type: 'system', text: '>>> SİSTEM SIFIRLANDI (ESC) <<<' }]);
-    this.scrollToBottom();
+    this.scrollToBottom(true);
   }
 
   // YENİ: Çarpışma (Collision) Çözümleme - Blokların üst üste binmesini engeller
