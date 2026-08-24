@@ -114,6 +114,35 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
   // YENİ: Token Animasyonu İçin Veri
   currentDataToken: string = '';
   currentDtoName = signal<string | null>(null);
+  
+  // YENİ: Token içindeki yazıları satırlara bölme
+  currentDataTokenLines() {
+    return (this.currentDataToken || 'Veri').split('\n');
+  }
+  
+  getTokenLineCount() {
+    return (this.currentDtoName() ? 1 : 0) + this.currentDataTokenLines().length;
+  }
+  
+  getTokenRectHeight() {
+    return this.getTokenLineCount() * 16 + 12;
+  }
+  
+  getTokenRectY() {
+    const count = this.getTokenLineCount();
+    if (count === 1) return 30;
+    if (count === 2) return 22;
+    if (count === 3) return 14;
+    return 10;
+  }
+  
+  getTokenTextY() {
+    const count = this.getTokenLineCount();
+    if (count === 1) return 46;
+    if (count === 2) return 42;
+    if (count === 3) return 38;
+    return 34;
+  }
 
   positionTrackerInterval: any;
   private lastElementPositions = new Map<string, string>();
@@ -1407,7 +1436,14 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           
           let finalLabel = '';
           if (!isDrawingBackground) {
-             finalLabel = step.label ? step.label.replace(/{DATA}/g, this.currentDataToken || 'Veri') : '';
+             let labelDataStr = this.currentDataToken || 'Veri';
+             if (labelDataStr.includes('\n')) {
+                labelDataStr = labelDataStr.split('\n')[0].replace('Ad: ', '').trim();
+             }
+             if (labelDataStr.includes(' (')) {
+                labelDataStr = labelDataStr.split(' (')[0].trim();
+             }
+             finalLabel = step.label ? step.label.replace(/{DATA}/g, labelDataStr) : '';
           }
 
           newLines.push({
