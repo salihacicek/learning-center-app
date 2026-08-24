@@ -1389,7 +1389,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         
         let corridorOffset = (loopIndex % 6) * 16 * (goingRight ? 1 : -1);
         const midX = x1 + (x2 - x1) / 2 + corridorOffset;
-        pathD = `M ${x1} ${adjFixedY1} C ${midX} ${adjFixedY1}, ${midX} ${adjFixedY2}, ${x2} ${adjFixedY2}`;
+        pathD = `M ${x1} ${adjFixedY1} L ${midX} ${adjFixedY1} L ${midX} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
         labelX = midX;
         
         const avgLineY = (adjFixedY1 + adjFixedY2) / 2;
@@ -1421,7 +1421,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         corridorOffset += ((loopIndex % 6) * 16 * (isReturn ? 1 : -1));
         midX += corridorOffset;
 
-        pathD = `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`;
+        pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
         
         // Etiketlerin blokların üstüne gelmemesi için yatayda midX'i kullanıyoruz.
         // Dikeyde (Y) ise okun başladığı yatay çizginin hemen üstüne (y1 - 25) yerleştiriyoruz ki 
