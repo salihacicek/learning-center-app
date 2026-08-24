@@ -1313,17 +1313,17 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         // Kutuların arasındaki dikey boşluktan inebilmek için:
         let midX = (x1 + x2) / 2;
         
-        // İleri ve geri (return) okları birbirinden HESAPLI bir şekilde ayırarak çapraz kesişmelerini KÖKÜNDEN önlüyoruz
-        midX += (isReturn ? 30 : -30);
-        midX += (fromIdx * 8 * (isReturn ? 1 : -1));
+        // Dikey çizgilerin (özellikle farklı kutulardan gelen dönüş oklarının) üst üste binmesini engellemek için:
+        // Hem isReturn'e göre ana şeridi ayırıyoruz, hem de global adım indeksine (i) göre eşsiz bir koridor atıyoruz!
+        let corridorOffset = isReturn ? 15 : -15;
+        corridorOffset += ((i % 4) * 16 * (isReturn ? 1 : -1));
+        midX += corridorOffset;
 
         pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
         
-        // Etiketlerin kutuların üzerine (blockların üstüne) denk gelmesini önlemek için:
-        // Y ekseninde tam kutuların arasındaki "boşluk" olan (y1+y2)/2 noktasına koyuyoruz.
-        // Gidiş ve dönüş etiketleri üst üste binmesin diye de isReturn'e göre hafif aşağı/yukarı kaydırıyoruz.
+        // Etiketlerin blokların üstüne gelmemesi için yatayda midX'i, dikeyde ise ortalamayı kullanıp i'ye göre kaydırıyoruz
         labelX = midX;
-        labelY = ((y1 + y2) / 2) + (isReturn ? 35 : -35);
+        labelY = ((y1 + y2) / 2) + ((i % 2 === 0) ? 45 : -45);
       }
 
       // 3. Adım: Hangi okun hangi renk olacağını ve dönüş mü gidiş mi olduğunu belirle
