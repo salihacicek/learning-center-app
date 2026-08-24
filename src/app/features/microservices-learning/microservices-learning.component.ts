@@ -1309,19 +1309,20 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
 
       // 2. Yan Yana Kolonlar (Yatay Bağlantı)
       } else if (isAdjacent && Math.abs(dy) < 150) {
-        // Basit yatay çizgi
+        // Zıt yönlü (gidiş/dönüş) çizgilerin birbirini kesmesini önlemek için dikey ofset (sapma) ekliyoruz.
+        let adjFixedY1 = fixedY1 + (goingRight ? -18 : 18);
+        let adjFixedY2 = fixedY2 + (goingRight ? -18 : 18);
+
         x1 = goingRight ? from.right : from.left;
-        y1 = fixedY1;
+        y1 = adjFixedY1;
         x2 = goingRight ? to.left : to.right;
-        y2 = fixedY2;
+        y2 = adjFixedY2;
         
-        // midX'i fromIdx'e göre az miktarda kaydır ki çok bitişik kolonlarda ters yöne ok çıkmasın (overshoot engeli)
         const midX = x1 + (x2 - x1) / 2 + (fromIdx * 6 * (goingRight ? 1 : -1));
-        pathD = `M ${x1} ${fixedY1} L ${midX} ${fixedY1} L ${midX} ${fixedY2} L ${x2} ${fixedY2}`;
+        pathD = `M ${x1} ${adjFixedY1} L ${midX} ${adjFixedY1} L ${midX} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
         labelX = midX;
-        // Çizginin (okun) yukarıda mı aşağıda mı olduğunu kutuların merkezlerine göre anlıyoruz.
-        // Hangi ok üstteyse etiketi üstte, alttaysa altta kalsın ki birbirlerini çapraz kesmesinler.
-        const avgLineY = (fixedY1 + fixedY2) / 2;
+        
+        const avgLineY = (adjFixedY1 + adjFixedY2) / 2;
         const avgBoxY = (from.centerY + to.centerY) / 2;
         let yOffset = 0;
         if (avgLineY < avgBoxY - 5) {
@@ -1329,7 +1330,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         } else if (avgLineY > avgBoxY + 5) {
            yOffset = 25; // Ok altta, etiket de altta
         } else {
-           yOffset = goingRight ? -25 : 25; // Tam ortadaysa
+           yOffset = goingRight ? -25 : 25; 
         }
         labelY = avgLineY + yOffset;
 
