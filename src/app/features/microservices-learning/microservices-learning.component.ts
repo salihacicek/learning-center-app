@@ -1374,12 +1374,21 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           labelY = y1 - 25;
         }
 
-      // 2. ve 3. Tüm Farklı Kolonlar (Düz Çapraz)
+      // 2. ve 3. Tüm Farklı Kolonlar (Düz Çapraz veya Yatay)
       } else {
+        // Zıt yönlü (gidiş/dönüş) çizgilerin birbirini kesmesini önlemek için dikey ofset (sapma) ekliyoruz.
+        // EĞER aynı iki kutu arasında başka bir adım varsa, ona göre farklı bir offset de eklenebilir.
+        // Ama genelde gidiş ve dönüş yeterli.
+        let yOffset = goingRight ? -18 : 18;
+        
+        // Eğer aynı akış içinde aynı yönde giden birden fazla ok varsa yatayda/dikeyde çakışmasın diye ekstra offset
+        const corridorOffset = (loopIndex % 3) * 12; // ufak bir kaydırma
+        yOffset += corridorOffset;
+
         x1 = goingRight ? from.right : from.left;
-        y1 = from.centerY;
+        y1 = from.centerY + yOffset;
         x2 = goingRight ? to.left : to.right;
-        y2 = to.centerY;
+        y2 = to.centerY + yOffset;
 
         pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
         
