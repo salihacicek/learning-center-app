@@ -64,12 +64,14 @@ export const ADVANCED_FLOWS: FlowPath[] = [
     id: 'crud-flow',
     name: '2. Veri Ekleme Akışı (Authorization - Yetkilendirme İşlemi)',
     steps: [
-      { fromNodeId: 'client-node', toNodeId: 'gateway-node', label: '1. "{DATA}" ekleme isteği (CreateDTO ve Token) gönderilir' },
-      { fromNodeId: 'gateway-node', toNodeId: 'crud-service', label: '2. Gateway, Token yetkisini onaylar ve CreateDTO\'yu servise iletir' },
-      { fromNodeId: 'crud-service', toNodeId: 'crud-db', label: '3. Özel Alan Servisi yetkili işlemi DB\'ye yazar' },
-      { fromNodeId: 'crud-db', toNodeId: 'crud-service', label: '4. "{DATA}" başarıyla kaydedildi', isReturn: true },
-      { fromNodeId: 'crud-service', toNodeId: 'gateway-node', label: '5. İşlem onaylanır', isReturn: true },
-      { fromNodeId: 'gateway-node', toNodeId: 'client-node', label: '6. "{DATA}" işlemi tamamlandı (SuccessResponseDTO döndü)', isReturn: true }
+      { fromNodeId: 'client-node', toNodeId: 'gateway-node', label: '1. "{DATA}" ekleme isteği (Token ile birlikte) gönderilir' },
+      { fromNodeId: 'gateway-node', toNodeId: 'identity-service', label: '2. Gateway, Token\'ı doğrulamak için Kimlik Servisine sorar' },
+      { fromNodeId: 'identity-service', toNodeId: 'gateway-node', label: '3. Kimlik Servisi yetkiyi onaylar (Kullanıcı geçerli)', isReturn: true },
+      { fromNodeId: 'gateway-node', toNodeId: 'crud-service', label: '4. Yetki onaylandıktan sonra istek Özel Alan Servisine iletilir' },
+      { fromNodeId: 'crud-service', toNodeId: 'crud-db', label: '5. Özel Alan Servisi veriyi DB\'ye yazar' },
+      { fromNodeId: 'crud-db', toNodeId: 'crud-service', label: '6. "{DATA}" başarıyla kaydedildi', isReturn: true },
+      { fromNodeId: 'crud-service', toNodeId: 'gateway-node', label: '7. İşlem sonucu Gateway\'e iletilir', isReturn: true },
+      { fromNodeId: 'gateway-node', toNodeId: 'client-node', label: '8. "{DATA}" işlemi tamamlandı (200 OK döndü)', isReturn: true }
     ]
   },
   {
