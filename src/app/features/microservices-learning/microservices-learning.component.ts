@@ -1374,26 +1374,52 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           labelY = y1 - 25;
         }
 
-      // 2. ve 3. Tüm Farklı Kolonlar (Düz Çapraz veya Yatay)
-      } else {
+      // 2. Yan Yana Kolonlar (Yatay Bağlantı)
+      } else if (isAdjacent && Math.abs(dy) < 150) {
         // Zıt yönlü (gidiş/dönüş) çizgilerin birbirini kesmesini önlemek için dikey ofset (sapma) ekliyoruz.
-        // EĞER aynı iki kutu arasında başka bir adım varsa, ona göre farklı bir offset de eklenebilir.
-        // Ama genelde gidiş ve dönüş yeterli.
-        let yOffset = goingRight ? -18 : 18;
-        
-        // Eğer aynı akış içinde aynı yönde giden birden fazla ok varsa yatayda/dikeyde çakışmasın diye ekstra offset
-        const corridorOffset = (loopIndex % 3) * 12; // ufak bir kaydırma
-        yOffset += corridorOffset;
+        const corridorOffset = (loopIndex % 3) * 12; // Aynı yönde gidenleri ayırmak için
+        let adjFixedY1 = fixedY1 + (goingRight ? -18 : 18) + corridorOffset;
+        let adjFixedY2 = fixedY2 + (goingRight ? -18 : 18) + corridorOffset;
 
         x1 = goingRight ? from.right : from.left;
-        y1 = from.centerY + yOffset;
+        y1 = adjFixedY1;
         x2 = goingRight ? to.left : to.right;
-        y2 = to.centerY + yOffset;
-
-        pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+        y2 = adjFixedY2;
         
-        labelX = x1 + (x2 - x1) / 2;
-        labelY = y1 + (y2 - y1) / 2 - 20;
+        const midX = (from.centerX + to.centerX) / 2;
+        pathD = `M ${x1} ${adjFixedY1} L ${midX} ${adjFixedY1} L ${midX} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
+        labelX = midX;
+        
+        const avgLineY = (adjFixedY1 + adjFixedY2) / 2;
+        const avgBoxY = (from.centerY + to.centerY) / 2;
+        let yOffset = 0;
+        if (avgLineY < avgBoxY - 5) {
+           yOffset = -25;
+        } else if (avgLineY > avgBoxY + 5) {
+           yOffset = 25;
+        } else {
+           yOffset = goingRight ? -25 : 25; 
+        }
+        labelY = avgLineY + yOffset;
+
+      // 3. Uzak Kolonlar veya Çapraz/Wrap bağlantılar (Satır atlayanlar)
+      } else {
+        const corridorOffset = (loopIndex % 3) * 12; 
+        let adjFixedY1 = fixedY1 + (goingRight ? -18 : 18) + corridorOffset;
+        let adjFixedY2 = fixedY2 + (goingRight ? -18 : 18) + corridorOffset;
+
+        // Çapraz veya alt satıra geçişlerde doğrudan orta noktadan (basit Z-şekli) bağla
+        x1 = goingRight ? from.right : from.left;
+        y1 = adjFixedY1;
+        x2 = goingRight ? to.left : to.right;
+        y2 = adjFixedY2;
+        
+        // Kutuların arasındaki dikey boşluktan inebilmek için:
+        let midX = (from.centerX + to.centerX) / 2;
+        
+        pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
+        labelX = midX;
+        labelY = y1 - 25;
       }
 
       // 3. Adım: Hangi okun hangi renk olacağını ve dönüş mü gidiş mi olduğunu belirle
