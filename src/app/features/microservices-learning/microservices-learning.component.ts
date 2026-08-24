@@ -1188,8 +1188,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       const dx = to.centerX - from.centerX;
       const dy = to.centerY - from.centerY;
       
-      const isSameColumn = Math.abs(dx) < 200;
-      const isAdjacent = Math.abs(dx) >= 200 && Math.abs(dx) < 500;
+      const isSameColumn = elFrom.closest('.layer-column') === elTo.closest('.layer-column');
+      const isAdjacent = !isSameColumn;
       const isReturn = step.isReturn || false;
       const goingRight = dx > 0;
 
@@ -1336,8 +1336,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       // ── ORTOGONAL (GUTTER) ROUTING ALGORİTMASI ──
       // Kutu içinden geçmeleri %100 engellemek için sadece YAN kenarları kullanıyoruz.
 
-      const isSameColumn = Math.abs(dx) < 200;
-      const isAdjacent = Math.abs(dx) >= 200 && Math.abs(dx) < 500;
+      const isSameColumn = elFrom.closest('.layer-column') === elTo.closest('.layer-column');
+      const isAdjacent = !isSameColumn;
       const isReturn = step.isReturn || false;
 
       // 1. Aynı Kolon veya Alt Alta (dx küçük)
