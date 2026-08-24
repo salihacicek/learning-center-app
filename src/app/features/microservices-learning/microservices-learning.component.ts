@@ -1376,55 +1376,17 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           labelY = y1 - 25;
         }
 
-      // 2. Yan Yana Kolonlar (Yatay Bağlantı)
-      } else if (isAdjacent && Math.abs(dy) < 150) {
-        // Zıt yönlü (gidiş/dönüş) çizgilerin birbirini kesmesini önlemek için dikey ofset (sapma) ekliyoruz.
-        let adjFixedY1 = fixedY1 + (goingRight ? -18 : 18);
-        let adjFixedY2 = fixedY2 + (goingRight ? -18 : 18);
-
-        x1 = goingRight ? from.right : from.left;
-        y1 = adjFixedY1;
-        x2 = goingRight ? to.left : to.right;
-        y2 = adjFixedY2;
-        
-        const midX = x1 + (x2 - x1) / 2;
-        pathD = `M ${x1} ${adjFixedY1} L ${midX} ${adjFixedY1} L ${midX} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
-        labelX = midX;
-        
-        const avgLineY = (adjFixedY1 + adjFixedY2) / 2;
-        const avgBoxY = (from.centerY + to.centerY) / 2;
-        let yOffset = 0;
-        if (avgLineY < avgBoxY - 5) {
-           yOffset = -25; // Ok üstte, etiket de üstte
-        } else if (avgLineY > avgBoxY + 5) {
-           yOffset = 25; // Ok altta, etiket de altta
-        } else {
-           yOffset = goingRight ? -25 : 25; 
-        }
-        labelY = avgLineY + yOffset;
-
-      // 3. Uzak Kolonlar veya Çapraz/Wrap bağlantılar (Satır atlayanlar)
+      // 2. ve 3. Tüm Farklı Kolonlar (Düz Çapraz)
       } else {
-        // Çapraz veya alt satıra geçişlerde doğrudan orta noktadan (basit Z-şekli) bağla
         x1 = goingRight ? from.right : from.left;
-        y1 = fixedY1;
+        y1 = from.centerY;
         x2 = goingRight ? to.left : to.right;
-        y2 = fixedY2;
-        
-        // Kutuların arasındaki dikey boşluktan inebilmek için:
-        let midX = (x1 + x2) / 2;
-        
-        // Dikey çizgilerin (özellikle farklı kutulardan gelen dönüş oklarının) üst üste binmesini engellemek için:
-        // Hem isReturn'e göre ana şeridi ayırıyoruz, hem de global adım indeksine (i) göre eşsiz bir koridor atıyoruz!
-        
+        y2 = to.centerY;
 
-        pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
+        pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
         
-        // Etiketlerin blokların üstüne gelmemesi için yatayda midX'i kullanıyoruz.
-        // Dikeyde (Y) ise okun başladığı yatay çizginin hemen üstüne (y1 - 25) yerleştiriyoruz ki 
-        // gidiş-dönüş oklarında açıklamalar birbirine karışmasın!
-        labelX = midX;
-        labelY = y1 - 25;
+        labelX = x1 + (x2 - x1) / 2;
+        labelY = y1 + (y2 - y1) / 2 - 20;
       }
 
       // 3. Adım: Hangi okun hangi renk olacağını ve dönüş mü gidiş mi olduğunu belirle
