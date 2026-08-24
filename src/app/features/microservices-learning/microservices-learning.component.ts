@@ -1266,7 +1266,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           }
           
           pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
-          labelX = gutterX;
+          labelX = gutterX + 120; // Dikey çizginin sağ tarafındaki boşluğa al
           labelY = (y1 + y2) / 2;
         } else {
           // Sağ taraftan bracket (]) çiz
@@ -1278,7 +1278,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           const gutterX = Math.max(from.right, to.right) + 40 + (fromIdx * 20);
           
           pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
-          labelX = gutterX;
+          labelX = gutterX - 120; // Dikey çizginin sol tarafındaki boşluğa al
           labelY = (y1 + y2) / 2;
         }
 
@@ -1294,7 +1294,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         const midX = x1 + (x2 - x1) / 2 + (fromIdx * 6 * (goingRight ? 1 : -1));
         pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
         labelX = midX;
-        labelY = (y1 + y2) / 2;
+        labelY = ((y1 + y2) / 2) + (i % 2 === 0 ? -28 : 28); // Çizginin hafif üstüne veya altına kaydırarak çakışmayı önle
 
       // 3. Uzak Kolonlar veya Çapraz/Wrap bağlantılar (Satır atlayanlar)
       } else {
