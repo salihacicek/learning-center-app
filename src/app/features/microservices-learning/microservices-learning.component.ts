@@ -264,7 +264,6 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       
       if (this.pendingFlow === 'crud-flow') {
          finalParam = finalParam || 'Veri Sil';
-         this.consoleHistory.update(h => [...h, { type: 'user', text: finalParam }]);
          this.activePrompt.set({
             step: 'input2',
             prefix: 'İşlem Yapılacak Veri:',
@@ -276,7 +275,6 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
          return;
       } else if (this.pendingFlow === 'register-flow') {
          finalParam = finalParam || 'Saliha Çiçek';
-         this.consoleHistory.update(h => [...h, { type: 'user', text: finalParam }]);
          this.activePrompt.set({
             step: 'input2',
             prefix: 'Yaş:',
