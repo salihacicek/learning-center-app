@@ -1259,7 +1259,11 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           x2 = to.left;
           y2 = fixedY2;
           
-          const gutterX = Math.min(from.left, to.left) - 40 - (fromIdx * 20);
+          let gutterX = Math.min(from.left, to.left) - 40 - (fromIdx * 20);
+          
+          if (activeFlow.id === 'genel-mimari-advanced' && step.isParallel) {
+             gutterX -= 30; // Paralel geri dönüş okunu biraz daha sola iterek dikeyde üst üste binmesini engelliyoruz
+          }
           
           pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
           labelX = gutterX;
