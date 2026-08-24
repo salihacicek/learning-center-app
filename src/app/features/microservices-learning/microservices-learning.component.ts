@@ -120,6 +120,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
   nodeOffsets = new Map<string, { x: number; y: number }>();
 
   @ViewChild('masterTokenAnimator') masterTokenAnimator?: ElementRef<SVGElement>;
+  @ViewChild('parallelTokenAnimator') parallelTokenAnimator?: ElementRef<SVGElement>;
 
   constructor(private sanitizer: DomSanitizer) {}
 
@@ -536,6 +537,9 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     setTimeout(() => {
       if (this.masterTokenAnimator?.nativeElement) {
         (this.masterTokenAnimator.nativeElement as any).beginElement();
+      }
+      if (this.parallelTokenAnimator?.nativeElement && this.activeParallelTokenPathD()) {
+        (this.parallelTokenAnimator.nativeElement as any).beginElement();
       }
     }, 50);
 
@@ -1315,14 +1319,20 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         // Zıplamayı (Jump) önlemek için: Önceki okun bittiği yer ile bu okun başladığı yeri birleştir.
         let tokenPathD = pathD;
         if (i > 0) {
-          const prevStep = newLines[i - 1];
-          // Mümkünse dinamik olarak M x1 y1 kısmını L x1 y1'e çevirerek birleştir.
-          tokenPathD = pathD.replace(`M ${x1} ${y1}`, `M ${prevStep.x2} ${prevStep.y2} L ${x1} ${y1}`);
+          let prevStep = newLines.find(l => l.stepIndex === i && (step.isParallel ? !!l.parallelTokenPathD : !l.parallelTokenPathD));
+          
+          if (step.isParallel && i === 1) {
+             prevStep = newLines.find(l => l.stepIndex === i && !l.parallelTokenPathD);
+          }
+          
+          if (prevStep) {
+             tokenPathD = pathD.replace(`M ${x1} ${y1}`, `M ${prevStep.x2} ${prevStep.y2} L ${x1} ${y1}`);
+          }
         }
 
         const isParallelActive = !isDrawingBackground && (i === this.currentStepIndex() && !this.isAnimationFinished());
         const activeStatus = isDrawingBackground ? false : (i === this.currentStepIndex() && !this.isAnimationFinished());
-        const shouldDraw = isDrawingBackground || activeStatus;
+        const shouldDraw = isDrawingBackground || i <= this.currentStepIndex() || this.isAnimationFinished();
 
         if (shouldDraw) {
           const idSuffix = step.isParallel ? 'parallel-' : '';
