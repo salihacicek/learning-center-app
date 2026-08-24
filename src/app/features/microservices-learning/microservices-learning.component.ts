@@ -1387,8 +1387,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         x2 = goingRight ? to.left : to.right;
         y2 = adjFixedY2;
         
-        let corridorOffset = (loopIndex % 6) * 16 * (goingRight ? 1 : -1);
-        const midX = x1 + (x2 - x1) / 2 + corridorOffset;
+        const midX = x1 + (x2 - x1) / 2;
         pathD = `M ${x1} ${adjFixedY1} L ${midX} ${adjFixedY1} L ${midX} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
         labelX = midX;
         
@@ -1417,9 +1416,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         
         // Dikey çizgilerin (özellikle farklı kutulardan gelen dönüş oklarının) üst üste binmesini engellemek için:
         // Hem isReturn'e göre ana şeridi ayırıyoruz, hem de global adım indeksine (i) göre eşsiz bir koridor atıyoruz!
-        let corridorOffset = isReturn ? 15 : -15;
-        corridorOffset += ((loopIndex % 6) * 16 * (isReturn ? 1 : -1));
-        midX += corridorOffset;
+        
 
         pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
         
