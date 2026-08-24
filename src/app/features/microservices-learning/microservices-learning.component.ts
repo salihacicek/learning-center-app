@@ -1188,7 +1188,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       const dx = to.centerX - from.centerX;
       const dy = to.centerY - from.centerY;
       
-      const isSameColumn = elFrom.closest('.layer-column') === elTo.closest('.layer-column');
+      const isSameColumn = Math.abs(dx) < 200;
       const isAdjacent = !isSameColumn;
       const isReturn = step.isReturn || false;
       const goingRight = dx > 0;
@@ -1336,7 +1336,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       // ── ORTOGONAL (GUTTER) ROUTING ALGORİTMASI ──
       // Kutu içinden geçmeleri %100 engellemek için sadece YAN kenarları kullanıyoruz.
 
-      const isSameColumn = elFrom.closest('.layer-column') === elTo.closest('.layer-column');
+      const isSameColumn = Math.abs(dx) < 200;
       const isAdjacent = !isSameColumn;
       const isReturn = step.isReturn || false;
 
@@ -1357,8 +1357,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           }
           
           pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
-          labelX = gutterX; 
-          labelY = y1 - 25;
+          labelX = gutterX;
+          labelY = (y1 + y2) / 2;
         } else {
           // Sağ taraftan bracket (]) çiz
           x1 = from.right;
@@ -1370,15 +1370,15 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           const gutterX = Math.max(from.right, to.right) + 40 + corridorOffset;
           
           pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
-          labelX = gutterX; 
-          labelY = y1 - 25;
+          labelX = gutterX;
+          labelY = (y1 + y2) / 2;
         }
 
       // 2. Yan Yana Kolonlar (Yatay Bağlantı)
       } else if (isAdjacent && Math.abs(dy) < 150) {
         // Zıt yönlü (gidiş/dönüş) çizgilerin birbirini kesmesini önlemek için dikey ofset (sapma) ekliyoruz.
-        let adjFixedY1 = fixedY1 + (goingRight ? -18 : 18);
-        let adjFixedY2 = fixedY2 + (goingRight ? -18 : 18);
+        let adjFixedY1 = fixedY1;
+        let adjFixedY2 = fixedY2;
 
         x1 = goingRight ? from.right : from.left;
         y1 = adjFixedY1;
@@ -1403,8 +1403,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
 
       // 3. Uzak Kolonlar veya Çapraz/Wrap bağlantılar (Satır atlayanlar)
       } else {
-        let adjFixedY1 = fixedY1 + (goingRight ? -18 : 18);
-        let adjFixedY2 = fixedY2 + (goingRight ? -18 : 18);
+        let adjFixedY1 = fixedY1;
+        let adjFixedY2 = fixedY2;
 
         // Çapraz veya alt satıra geçişlerde doğrudan orta noktadan (basit Z-şekli) bağla
         x1 = goingRight ? from.right : from.left;
@@ -1417,7 +1417,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         
         pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
         labelX = midX;
-        labelY = y1 - 25;
+        labelY = (y1 + y2) / 2;
       }
 
       // 3. Adım: Hangi okun hangi renk olacağını ve dönüş mü gidiş mi olduğunu belirle
