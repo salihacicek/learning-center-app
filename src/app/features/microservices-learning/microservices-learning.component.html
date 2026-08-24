@@ -73,7 +73,7 @@
     <div class="schema-board" #boardWrapper [class.has-active-flow]="activeFlowId() !== null" [class.mode-advanced]="activeMode() === 'advanced'">
       
       <!-- SVG OVERLAY: Artık schema-board içinde olduğu için scroll'da kutularla beraber kayar -->
-      <svg class="schema-svg-overlay">
+      <svg class="schema-svg-overlay" [style.width.px]="svgWidth" [style.height.px]="svgHeight">
         
         <defs>
           <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
