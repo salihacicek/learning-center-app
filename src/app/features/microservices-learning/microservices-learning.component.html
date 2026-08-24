@@ -177,7 +177,7 @@
                  [class.active-label]="line.active && !isAnimationFinished()" 
                  [class.default-label]="line.isDefaultBackground"
                  [class.return-label]="line.isReturn">
-               <div class="text-label" 
+               <div class="text-label" [ngClass]="'align-' + (line.labelAlign || 'center')" 
                     [style.color]="line.lineColor"
                     [style.border-color]="line.lineColor"
                     [class.text-active]="!line.isDefaultBackground">

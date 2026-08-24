@@ -55,6 +55,7 @@ export interface SvgLine {
   midX: number; 
   labelX: number;
   labelY: number;
+  labelAlign?: 'center' | 'left' | 'right';
   pathD?: string;
   tokenPathD?: string;
   label: string;
@@ -1328,6 +1329,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       let x1: number, y1: number, x2: number, y2: number;
       let pathD: string;
       let labelX: number, labelY: number;
+      let labelAlign: 'center' | 'left' | 'right' = 'center';
 
       // Aynı kutu kontrolü
       const sameBox = Math.abs(dx) < 10 && Math.abs(dy) < 10;
@@ -1359,6 +1361,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
           labelX = gutterX;
           labelY = (y1 + y2) / 2;
+          labelAlign = 'right';
         } else {
           // Sağ taraftan bracket (]) çiz
           x1 = from.right;
@@ -1372,6 +1375,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
           labelX = gutterX;
           labelY = (y1 + y2) / 2;
+          labelAlign = 'left';
         }
 
       // 2. Yan Yana Kolonlar (Yatay Bağlantı)
@@ -1418,7 +1422,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
         labelX = midX;
         labelY = (y1 + y2) / 2;
-      }
+          labelAlign = 'left';
+        }
 
       // 3. Adım: Hangi okun hangi renk olacağını ve dönüş mü gidiş mi olduğunu belirle
       let lineColor = this.getLineColor(i);
@@ -1474,7 +1479,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
             stepIndex: i + 1,
             lineColor: lColor,
             markerEnd: mEnd,
-            parallelTokenPathD: step.isParallel ? pathD : undefined
+            parallelTokenPathD: step.isParallel ? pathD : undefined,
+            labelAlign
           });
         }
       }

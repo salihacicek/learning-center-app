@@ -1618,3 +1618,15 @@
   text-align: center !important;
   align-items: center !important;
 }
+
+.text-label.align-left {
+  transform: translate(12px, -50%) !important;
+}
+
+.text-label.align-right {
+  transform: translate(calc(-100% - 12px), -50%) !important;
+}
+
+.text-label.align-center {
+  transform: translate(-50%, -50%) !important;
+}
