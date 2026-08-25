@@ -1516,9 +1516,13 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
              else { yOffset = goingRight ? -14 : 14; }
           }
           else if (activeFlow.id === 'register-flow') {
-             yOffset = goingRight ? -12 : 12;
-             let shiftMultiplier = pairIdx;
-             yOffset += (goingRight ? -28 : 28) * shiftMultiplier;
+             if (loopIndex === 0) { yOffset = -20; }      // Step 1
+             else if (loopIndex === 9) { yOffset = 10; }  // Step 10 (Yukarı çekildi, eskiden 40 idi)
+             else {
+                 yOffset = goingRight ? -12 : 12;
+                 let shiftMultiplier = pairIdx;
+                 yOffset += (goingRight ? -28 : 28) * shiftMultiplier;
+             }
           }
           else {
              // Diğer yerler için standart hesap
