@@ -266,6 +266,12 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       
       if (this.pendingFlow === 'crud-flow') {
          finalParam = finalParam || 'Veri Sil';
+         
+         const lower = finalParam.toLowerCase();
+         if (!lower.includes('ekle') && !lower.includes('sil') && !lower.includes('güncel') && !lower.includes('guncel')) {
+             this.consoleHistory.update(h => [...h, { type: 'system', text: 'Hata: Geçersiz işlem girdiniz! Lütfen sadece "Ekle", "Sil" veya "Güncelle" içeren bir işlem türü yazın.' }]);
+             return;
+         }
          this.activePrompt.set({
             step: 'input2',
             prefix: 'İşlem Yapılacak Veri:',
@@ -302,6 +308,13 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
          this.executeFlowWithParam(this.pendingFlow!, combined);
       } else if (this.pendingFlow === 'register-flow') {
          finalData = finalData || '18';
+         
+         const ageNum = parseInt(finalData, 10);
+         if (isNaN(ageNum) || ageNum < 1 || ageNum > 99 || !/^\d{1,2}$/.test(finalData.trim())) {
+             this.consoleHistory.update(h => [...h, { type: 'system', text: 'Hata: Lütfen geçerli bir yaş giriniz (1-99 arası sadece rakam, örn: 25).' }]);
+             return; // Kullanıcıdan tekrar girmesini bekle
+         }
+         
          const combined = `Ad: ${prompt.action}\nYaş: ${finalData}`;
          this.executeFlowWithParam(this.pendingFlow!, combined);
       }
