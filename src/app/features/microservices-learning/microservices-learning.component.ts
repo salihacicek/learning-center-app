@@ -270,6 +270,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
          const lower = finalParam.toLowerCase();
          if (!lower.includes('ekle') && !lower.includes('sil') && !lower.includes('güncel') && !lower.includes('guncel')) {
              this.consoleHistory.update(h => [...h, { type: 'system', text: 'Hata: Geçersiz işlem girdiniz! Lütfen sadece "Ekle", "Sil" veya "Güncelle" içeren bir işlem türü yazın.' }]);
+             this.consoleInput = '';
+             this.scrollToBottom();
              return;
          }
          this.activePrompt.set({
@@ -311,8 +313,10 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
          
          const ageNum = parseInt(finalData, 10);
          if (isNaN(ageNum) || ageNum < 1 || ageNum > 99 || !/^\d{1,2}$/.test(finalData.trim())) {
-             this.consoleHistory.update(h => [...h, { type: 'system', text: 'Hata: Lütfen geçerli bir yaş giriniz (1-99 arası sadece rakam, örn: 25).' }]);
-             return; // Kullanıcıdan tekrar girmesini bekle
+             this.consoleHistory.update(h => [...h, { type: 'system', text: 'Hata: Lütfen geçerli bir yaş giriniz.' }]);
+             this.consoleInput = '';
+             this.scrollToBottom();
+             return;
          }
          
          const combined = `Ad: ${prompt.action}\nYaş: ${finalData}`;
