@@ -1480,6 +1480,20 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
              else if (loopIndex === 5) { yOffset = 40; }   // Step 6 (En alttan U şeklinde çıkacak)
              else { yOffset = goingRight ? -12 : 12; } // Fallback
           }
+          else if (activeFlow.id === 'crud-flow' && 
+             ((step.fromNodeId === 'identity-service' && step.toNodeId === 'identity-db') ||
+              (step.fromNodeId === 'identity-db' && step.toNodeId === 'identity-service') ||
+              (step.fromNodeId === 'crud-service' && step.toNodeId === 'crud-db') ||
+              (step.fromNodeId === 'crud-db' && step.toNodeId === 'crud-service'))) {
+             
+             // Kullanıcı CRUD akışında da okların net bir şekilde yukarıdan aşağıya (Top-to-Bottom)
+             // inmesini istedi. İndexlere göre manuel olarak en üstten en alta diziyoruz.
+             if (loopIndex === 2) { yOffset = -22; }       // Step 3 (Identity -> DB, Üst)
+             else if (loopIndex === 3) { yOffset = 22; }   // Step 4 (DB -> Identity, Alt)
+             else if (loopIndex === 5) { yOffset = -22; }  // Step 6 (Crud -> DB, Üst)
+             else if (loopIndex === 6) { yOffset = 22; }   // Step 7 (DB -> Crud, Alt)
+             else { yOffset = goingRight ? -14 : 14; }
+          }
           else if (activeFlow.id === 'register-flow') {
              yOffset = goingRight ? -12 : 12;
              let shiftMultiplier = pairIdx;
