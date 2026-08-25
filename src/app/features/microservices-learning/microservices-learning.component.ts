@@ -288,6 +288,9 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
          return;
       } else {
          finalParam = finalParam || 'Saliha Çiçek';
+         if (this.pendingFlow === 'login-flow') {
+            finalParam = `Ad: ${finalParam}`;
+         }
          this.executeFlowWithParam(this.pendingFlow!, finalParam);
       }
     } else if (prompt?.step === 'input2') {
