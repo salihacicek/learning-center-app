@@ -1518,7 +1518,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           if (activeFlow.id === 'register-flow' && loopIndex === 5) {
              // 4. oku (Step 6) U şeklinde aşağıdan dolaştır ki alan ferahlasın
              let bottomY = Math.max(from.bottom, to.bottom) + 35; // Kutuların altından dolaş
-             pathD = `M ${x1} ${adjFixedY1} L ${x1 - 15} ${adjFixedY1} L ${x1 - 15} ${bottomY} L ${x2 + 15} ${bottomY} L ${x2 + 15} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
+             let dirOffset = goingRight ? 15 : -15; // Kutunun DIŞINA doğru (boşluğa) çık
+             pathD = `M ${x1} ${adjFixedY1} L ${x1 + dirOffset} ${adjFixedY1} L ${x1 + dirOffset} ${bottomY} L ${x2 - dirOffset} ${bottomY} L ${x2 - dirOffset} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
              labelX = midX;
              labelY = bottomY - 10;
           } else {
