@@ -1627,13 +1627,52 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           let finalLabel = '';
           if (!isDrawingBackground) {
              let labelDataStr = this.currentDataToken || 'Veri';
-             if (labelDataStr.includes('\n')) {
-                labelDataStr = labelDataStr.split('\n')[0].replace('Ad: ', '').trim();
+             
+             if (activeFlow.id === 'crud-flow') {
+                 let dataName = labelDataStr;
+                 let action = 'genel';
+                 const match = labelDataStr.match(/(.*)\s*\((.*)\)/);
+                 if (match) {
+                     dataName = match[1].trim();
+                     action = match[2].toLowerCase();
+                 }
+                 
+                 let actionWord = 'işlemi';
+                 let dbAction = 'işlemini DB\'de uygular';
+                 let dbSuccess = 'işlemi DB\'de başarıyla tamamlandı';
+                 let httpCode = '200 OK';
+                 
+                 if (action.includes('ekle')) {
+                     actionWord = 'ekleme';
+                     dbAction = 'verisini DB\'ye ekler';
+                     dbSuccess = 'DB\'ye başarıyla kaydedildi';
+                     httpCode = '201 Created';
+                 } else if (action.includes('sil')) {
+                     actionWord = 'silme';
+                     dbAction = 'verisini DB\'den siler';
+                     dbSuccess = 'DB\'den başarıyla silindi';
+                     httpCode = '204 No Content';
+                 } else if (action.includes('güncel') || action.includes('guncel')) {
+                     actionWord = 'güncelleme';
+                     dbAction = 'verisini DB\'de günceller';
+                     dbSuccess = 'DB\'de başarıyla güncellendi';
+                     httpCode = '200 OK';
+                 }
+                 
+                 if (i === 0) finalLabel = `1. "${dataName}" ${actionWord} isteği gönderilir`;
+                 else if (i === 5) finalLabel = `6. Özel Alan Servisi "${dataName}" ${dbAction}`;
+                 else if (i === 6) finalLabel = `7. "${dataName}" ${dbSuccess}`;
+                 else if (i === 8) finalLabel = `9. "${dataName}" ${actionWord} işlemi tamamlandı (${httpCode} döndü)`;
+                 else finalLabel = step.label ? step.label.replace(/{DATA}/g, dataName) : '';
+             } else {
+                 if (labelDataStr.includes('\n')) {
+                    labelDataStr = labelDataStr.split('\n')[0].replace('Ad: ', '').trim();
+                 }
+                 if (labelDataStr.includes(' (')) {
+                    labelDataStr = labelDataStr.split(' (')[0].trim();
+                 }
+                 finalLabel = step.label ? step.label.replace(/{DATA}/g, labelDataStr) : '';
              }
-             if (labelDataStr.includes(' (')) {
-                labelDataStr = labelDataStr.split(' (')[0].trim();
-             }
-             finalLabel = step.label ? step.label.replace(/{DATA}/g, labelDataStr) : '';
           }
 
           newLines.push({
