@@ -299,7 +299,15 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
          return;
       } else {
          if (this.pendingFlow === 'login-flow') {
-            finalParam = `Ad: ${finalParam}`;
+            this.activePrompt.set({
+               step: 'input2',
+               prefix: 'Şifreniz:',
+               placeholder: 'Örn: 123456',
+               action: finalParam
+            });
+            this.consoleInput = '';
+            this.scrollToBottom();
+            return;
          }
          this.executeFlowWithParam(this.pendingFlow!, finalParam);
       }
@@ -324,8 +332,35 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
              return;
          }
          
-         const combined = `Ad: ${prompt.action}\nYaş: ${finalData}`;
+         // Parola almak için input3'e geç
+         this.activePrompt.set({
+            step: 'input3',
+            prefix: 'Şifre Belirleyin:',
+            placeholder: 'Örn: 123456',
+            action: prompt.action + '|' + finalData
+         });
+         this.consoleInput = '';
+         this.scrollToBottom();
+         return;
+      } else if (this.pendingFlow === 'login-flow') {
+         // Login-flow için input2'de şifre aldık, artık birleştirip çalıştırabiliriz
+         const combined = `Ad: ${prompt.action}\nŞifre: ${finalData}`;
          this.executeFlowWithParam(this.pendingFlow!, combined);
+      }
+    } else if (prompt?.step === 'input3') {
+      let finalData = cmd.trim();
+      if (!finalData) {
+          this.consoleHistory.update(h => [...h, { type: 'system', text: 'Hata: Boş giriş yapılamaz.' }]);
+          this.consoleInput = '';
+          return;
+      }
+
+      if (this.pendingFlow === 'register-flow') {
+          const parts = (prompt.action || '').split('|');
+          const name = parts[0];
+          const age = parts[1];
+          const combined = `Ad: ${name}\nYaş: ${age}\nŞifre: ${finalData}`;
+          this.executeFlowWithParam(this.pendingFlow!, combined);
       }
     }
     
