@@ -1359,15 +1359,23 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       const isReturn = step.isReturn || false;
 
       if (isDrawingBackground) {
-        // ARKA PLAN (Genel Mimari):
-        // 1) Yan yana ve aynı hizada olanlar için düz yatay
-        // 2) Çapraz olanlar için düz çapraz
-        let bgOffset = goingRight ? -12 : 12; 
+        // ARKA PLAN (Genel Mimari): Her zaman dümdüz çizgiler (yataysa yatay, eğikse çapraz)
+        // Kesişmeyi ve uçların birbirine girmesini önlemek için:
+        // 1. "fixedY1" ve "fixedY2" kullanarak Kimlik ve Özel Alan bağlantılarını Gateway'in üst ve alt kısımlarına dağıtıyoruz.
+        // 2. Gidiş ve dönüş çizgilerini birbirinden ayırmak için (yOffset) uyguluyoruz.
+        
+        let yOffset = goingRight ? -15 : 15; // Çizgiler arası mesafeyi açtık (-15 ve +15 = 30px fark)
         
         x1 = goingRight ? from.right : from.left;
-        y1 = from.centerY + bgOffset;
+        y1 = fixedY1 + yOffset;
         x2 = goingRight ? to.left : to.right;
-        y2 = to.centerY + bgOffset;
+        y2 = fixedY2 + yOffset;
+        
+        // Eğer tamamen aynı hizada iseler (Örn: Kimlik -> Kimlik DB), y1 ve y2 eşit olsun ki dümdüz olsun
+        if (Math.abs(from.centerY - to.centerY) < 20) {
+           y1 = from.centerY + yOffset;
+           y2 = to.centerY + yOffset;
+        }
         
         pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
         labelX = (x1 + x2) / 2;
