@@ -68,7 +68,7 @@ export const ADVANCED_FLOWS: FlowPath[] = [
       { fromNodeId: 'gateway-node', toNodeId: 'identity-service', label: '2. Gateway, doğrulamak için isteği Kimlik Servisine iletir', dtoName: 'Token + DataDTO' },
       { fromNodeId: 'identity-service', toNodeId: 'identity-db', label: '3. Kimlik Servisi yetki durumunu DB\'den kontrol eder' },
       { fromNodeId: 'identity-db', toNodeId: 'identity-service', label: '4. DB onayı: Kullanıcı aktif ve yetkili', isReturn: true },
-      { fromNodeId: 'identity-service', toNodeId: 'crud-service', label: '5. Kimlik doğrulandı, istek doğrudan Özel Alan Servisine aktarılır', dtoName: 'DataDTO' },
+      { fromNodeId: 'identity-service', toNodeId: 'crud-service', label: '5. Kimlik doğrulandı, istek doğrudan Özel Alan Servisine aktarılır', dtoName: 'Token + DataDTO' },
       { fromNodeId: 'crud-service', toNodeId: 'crud-db', label: '6. Özel Alan Servisi "{DATA}" işlemini DB\'de uygular', dtoName: 'Entity' },
       { fromNodeId: 'crud-db', toNodeId: 'crud-service', label: '7. "{DATA}" işlemi DB\'de başarıyla tamamlandı', isReturn: true },
       { fromNodeId: 'crud-service', toNodeId: 'gateway-node', label: '8. İşlem sonucu Gateway\'e iletilir', isReturn: true, dtoName: 'SuccessDTO' },
