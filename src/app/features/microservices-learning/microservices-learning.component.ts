@@ -1464,9 +1464,18 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         // 2. Yan Yana Kolonlar (Yatay Bağlantı)
         } else if (isAdjacent && Math.abs(dy) < 150) {
           let yOffset = goingRight ? -15 : 15;
-          // Aynı yönde birden fazla ok varsa üst üste binmesin diye fromIdx/toIdx ile ayır
+          let gap = 20;
+          
+          // Sadece kayıt kısmında okların arasını hafif daha aç ki yazılar üst üste binmesin
+          // Ancak okların kutuya denk gelmesi için gap = 28 olarak sınırlandırdık (-12 ve -40 = kutu sınırında)
+          if (activeFlow.id === 'register-flow') {
+             yOffset = goingRight ? -12 : 12;
+             gap = 28; 
+          }
+          
+          // Aynı yönde birden fazla ok varsa üst üste binmesin diye ayır
           let shiftMultiplier = pairIdx;
-          yOffset += (goingRight ? -20 : 20) * shiftMultiplier;
+          yOffset += (goingRight ? -gap : gap) * shiftMultiplier;
           
           let adjFixedY1 = from.centerY + yOffset;
           let adjFixedY2 = to.centerY + yOffset;
