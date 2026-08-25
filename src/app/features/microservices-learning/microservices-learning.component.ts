@@ -1421,13 +1421,19 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         x2 = goingRight ? to.left : to.right;
         y2 = adjFixedY2;
         
-        // Kutuların arasındaki dikey boşluktan inebilmek için (Çizgilerin üst üste binmesini önle):
-        let laneOffset = ((i % 4) - 1.5) * 16;
-        let midX = ((from.centerX + to.centerX) / 2) + laneOffset;
-        
-        pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
-        labelX = midX;
-        labelY = (y1 + y2) / 2;
+        // Gelişmiş mimarinin ana sayfasında (isDrawingBackground) çapraz (direkt) oklar çiz
+        if (isDrawingBackground) {
+           pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+           labelX = (x1 + x2) / 2;
+           labelY = (y1 + y2) / 2;
+        } else {
+           // Yol haritası kısmında (aktif akış) asla bozulmamalı, köşeli ortogonal kalmalı
+           let laneOffset = ((i % 4) - 1.5) * 16;
+           let midX = ((from.centerX + to.centerX) / 2) + laneOffset;
+           pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
+           labelX = midX;
+           labelY = (y1 + y2) / 2;
+        }
           labelAlign = 'left';
         }
 
