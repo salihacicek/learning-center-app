@@ -262,10 +262,14 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         this.consoleHistory.update(h => [...h, { type: 'system', text: 'Geçersiz komut. Kullanabileceğiniz komutlar: "genel mimari", ' + (isAdvanced ? '"kayıt ol", ' : '') + '"giriş yap", ' + (isAdvanced ? '"crud işlemi yap"' : '"profil düzenle"') + ', "temizle"' }]);
       }
     } else if (prompt?.step === 'input1') {
-      let finalParam = cmd;
+      let finalParam = cmd.trim();
+      if (!finalParam) {
+          this.consoleHistory.update(h => [...h, { type: 'system', text: 'Hata: Boş giriş yapılamaz.' }]);
+          this.consoleInput = '';
+          return;
+      }
       
       if (this.pendingFlow === 'crud-flow') {
-         finalParam = finalParam || 'Veri Sil';
          
          const lower = finalParam.toLowerCase();
          if (!lower.includes('ekle') && !lower.includes('sil') && !lower.includes('güncel') && !lower.includes('guncel')) {
@@ -284,7 +288,6 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
          this.scrollToBottom(); // scroll page to input
          return;
       } else if (this.pendingFlow === 'register-flow') {
-         finalParam = finalParam || 'Saliha Çiçek';
          this.activePrompt.set({
             step: 'input2',
             prefix: 'Yaş:',
@@ -295,21 +298,23 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
          this.scrollToBottom(); // scroll page to input
          return;
       } else {
-         finalParam = finalParam || 'Saliha Çiçek';
          if (this.pendingFlow === 'login-flow') {
             finalParam = `Ad: ${finalParam}`;
          }
          this.executeFlowWithParam(this.pendingFlow!, finalParam);
       }
     } else if (prompt?.step === 'input2') {
-      let finalData = cmd;
+      let finalData = cmd.trim();
+      if (!finalData) {
+          this.consoleHistory.update(h => [...h, { type: 'system', text: 'Hata: Boş giriş yapılamaz.' }]);
+          this.consoleInput = '';
+          return;
+      }
       
       if (this.pendingFlow === 'crud-flow') {
-         finalData = finalData || 'Rapor 1';
          const combined = `${finalData} (${prompt.action})`;
          this.executeFlowWithParam(this.pendingFlow!, combined);
       } else if (this.pendingFlow === 'register-flow') {
-         finalData = finalData || '18';
          
          const ageNum = parseInt(finalData, 10);
          if (isNaN(ageNum) || ageNum < 1 || ageNum > 99 || !/^\d{1,2}$/.test(finalData.trim())) {
