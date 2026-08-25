@@ -1364,31 +1364,47 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         // 1. "fixedY1" ve "fixedY2" kullanarak Kimlik ve Özel Alan bağlantılarını Gateway'in üst ve alt kısımlarına dağıtıyoruz.
         // 2. Gidiş ve dönüş çizgilerini birbirinden ayırmak için (yOffset) uyguluyoruz.
         
-        // Kullanıcının çizdiği yönlere birebir uyması için dinamik offset:
-        let yOffset = 0;
-        // Eğer bağlantı yukarıdaki servisle (Kimlik) yapılıyorsa:
-        const isTargetAbove = goingRight ? to.centerY < from.centerY - 20 : from.centerY < to.centerY - 20;
+        // Kullanıcının çizdiği okları tam olarak kopyalamak ve ok başlarının çakışmasını
+        // %100 önlemek için manuel, paralel ve eşit aralıklı koordinatlar kullanıyoruz.
         
+        let yOffset1 = 0;
+        let yOffset2 = 0;
+
+        const isTargetAbove = goingRight ? (to.centerY < from.centerY - 20) : (from.centerY < to.centerY - 20);
+        const isTargetBelow = goingRight ? (to.centerY > from.centerY + 20) : (from.centerY > to.centerY + 20);
+
         if (isTargetAbove) {
-            // Gateway <-> Kimlik (Üst servis)
-            // Çizime göre: Sola giden (dönüş) ÜSTTE, Sağa giden (gidiş) ALTTA
-            yOffset = goingRight ? 15 : -15;
+            // Gateway <-> Kimlik
+            if (goingRight) {
+                // Gateway -> Kimlik
+                yOffset1 = -10; // Gateway'in hafif üstünden çık
+                yOffset2 = 10;  // Kimlik'in hafif altından gir
+            } else {
+                // Kimlik -> Gateway
+                yOffset1 = -10; // Kimlik'in hafif üstünden çık
+                yOffset2 = -30; // Gateway'in en üstünden gir
+            }
+        } else if (isTargetBelow) {
+            // Gateway <-> Özel Alan
+            if (goingRight) {
+                // Gateway -> Özel Alan
+                yOffset1 = 10;  // Gateway'in hafif altından çık
+                yOffset2 = -10; // Özel Alan'ın hafif üstünden gir
+            } else {
+                // Özel Alan -> Gateway
+                yOffset1 = 10;  // Özel Alan'ın hafif altından çık
+                yOffset2 = 30;  // Gateway'in en altından gir
+            }
         } else {
-            // Gateway <-> Özel Alan (Alt servis) veya Yatay (Gateway <-> Client)
-            // Çizime göre: Sağa giden (gidiş) ÜSTTE, Sola giden (dönüş) ALTTA
-            yOffset = goingRight ? -15 : 15;
+            // Yatay çizgiler (Gateway <-> Client, Kimlik <-> Kimlik DB vb.)
+            yOffset1 = goingRight ? -12 : 12;
+            yOffset2 = goingRight ? -12 : 12;
         }
-        
+
         x1 = goingRight ? from.right : from.left;
-        y1 = fixedY1 + yOffset;
+        y1 = from.centerY + yOffset1;
         x2 = goingRight ? to.left : to.right;
-        y2 = fixedY2 + yOffset;
-        
-        // Eğer tamamen aynı hizada iseler (Örn: Kimlik -> Kimlik DB), y1 ve y2 eşit olsun ki dümdüz olsun
-        if (Math.abs(from.centerY - to.centerY) < 20) {
-           y1 = from.centerY + yOffset;
-           y2 = to.centerY + yOffset;
-        }
+        y2 = to.centerY + yOffset2;
         
         pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
         labelX = (x1 + x2) / 2;
