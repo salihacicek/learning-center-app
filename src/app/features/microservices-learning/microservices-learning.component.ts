@@ -1464,6 +1464,10 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         // 2. Yan Yana Kolonlar (Yatay Bağlantı)
         } else if (isAdjacent && Math.abs(dy) < 150) {
           let yOffset = goingRight ? -15 : 15;
+          // Aynı yönde birden fazla ok varsa üst üste binmesin diye fromIdx/toIdx ile ayır
+          let shiftMultiplier = pairIdx;
+          yOffset += (goingRight ? -20 : 20) * shiftMultiplier;
+          
           let adjFixedY1 = from.centerY + yOffset;
           let adjFixedY2 = to.centerY + yOffset;
   
