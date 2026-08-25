@@ -1352,16 +1352,15 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       if (sameBox) return;
 
       if (activeFlow.id === 'register-flow' && loopIndex === 8) {
-         x1 = from.left - 5;
-         y1 = from.centerY + 10;
-         x2 = to.right + 20; // Ok ucu kesinlikle görünsün diye kutudan uzakta bitiriyoruz
-         y2 = to.centerY + 25;
+         // Step 9 (Identity -> Gateway): Dümdüz bir çizgi yapıyoruz ki ok ucu kırılmasın ve düzgün görünsün
+         x1 = from.left;
+         y1 = from.centerY + 20; // Hafif aşağıdan dümdüz geçsin
+         x2 = to.right + 8; // Kutuya tam değmesin ki ok ucu net anlaşılsın
+         y2 = to.centerY + 20; 
          
-         let customMidX = (x1 + x2) / 2;
-         
-         pathD = `M ${x1} ${y1} L ${customMidX} ${y1} L ${customMidX} ${y2} L ${x2} ${y2}`;
-         labelX = customMidX;
-         labelY = ((y1 + y2) / 2) - 15; 
+         pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+         labelX = (x1 + x2) / 2;
+         labelY = y1 - 10;
          labelAlign = 'center';
       } else {
 
@@ -1511,14 +1510,13 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
              else { yOffset = goingRight ? -14 : 14; }
           }
           else if (activeFlow.id === 'register-flow') {
-             if (loopIndex === 0) { yOffset = -25; }      // Step 1
-             else if (loopIndex === 9) { yOffset = -15; } // Step 10 (Yukarı çekildi)
+             if (loopIndex === 0) { yOffset = -30; }      // Step 1
+             else if (loopIndex === 9) { yOffset = -25; } // Step 10 (Epey yukarı çekildi)
              else {
                  yOffset = goingRight ? -12 : 12;
                  let shiftMultiplier = pairIdx;
                  yOffset += (goingRight ? -28 : 28) * shiftMultiplier;
              }
-          }
           }
           else {
              // Diğer yerler için standart hesap
