@@ -1583,8 +1583,10 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
              // inmesini istedi. İndexlere göre manuel olarak en üstten en alta diziyoruz.
              if (loopIndex === 2) { yOffset = -22; }       // Step 3 (Identity -> DB, Üst)
              else if (loopIndex === 3) { yOffset = 22; }   // Step 4 (DB -> Identity, Alt)
-             else if (loopIndex === 5) { yOffset = -22; }  // Step 6 (Crud -> DB, Üst)
-             else if (loopIndex === 6) { yOffset = 22; }   // Step 7 (DB -> Crud, Alt)
+             else if (loopIndex === 5) { yOffset = -45; }  // Step 6 (Crud -> DB, Bul)
+             else if (loopIndex === 6) { yOffset = -15; }  // Step 7 (DB -> Crud, Bulundu)
+             else if (loopIndex === 7) { yOffset = 15; }   // Step 8 (Crud -> DB, İşlem)
+             else if (loopIndex === 8) { yOffset = 45; }   // Step 9 (DB -> Crud, Başarılı)
              else { yOffset = goingRight ? -14 : 14; }
           }
           else if (activeFlow.id === 'register-flow') {
@@ -1695,31 +1697,41 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
                  }
                  
                  let actionWord = 'işlemi';
+                 let dbCheck = 'kaydını DB\'de kontrol eder';
+                 let dbCheckResult = 'DB kontrol sonucu döndü';
                  let dbAction = 'işlemini DB\'de uygular';
                  let dbSuccess = 'işlemi DB\'de başarıyla tamamlandı';
                  let httpCode = '200 OK';
                  
                  if (action.includes('ekle')) {
                      actionWord = 'ekleme';
+                     dbCheck = 'kaydının DB\'de olup olmadığını kontrol eder';
+                     dbCheckResult = 'kaydı DB\'de bulunmadı (Ekleme için uygun)';
                      dbAction = 'verisini DB\'ye ekler';
                      dbSuccess = 'DB\'ye başarıyla kaydedildi';
                      httpCode = '201 Created';
                  } else if (action.includes('sil')) {
                      actionWord = 'silme';
+                     dbCheck = 'kaydını bulmak için DB\'yi sorgular';
+                     dbCheckResult = 'kaydı DB\'de bulundu';
                      dbAction = 'verisini DB\'den siler';
                      dbSuccess = 'DB\'den başarıyla silindi';
                      httpCode = '204 No Content';
                  } else if (action.includes('güncel') || action.includes('guncel')) {
                      actionWord = 'güncelleme';
+                     dbCheck = 'kaydını bulmak için DB\'yi sorgular';
+                     dbCheckResult = 'kaydı DB\'de bulundu';
                      dbAction = 'verisini DB\'de günceller';
                      dbSuccess = 'DB\'de başarıyla güncellendi';
                      httpCode = '200 OK';
                  }
                  
                  if (i === 0) finalLabel = `1. "${dataName}" ${actionWord} isteği gönderilir`;
-                 else if (i === 5) finalLabel = `6. Özel Alan Servisi "${dataName}" ${dbAction}`;
-                 else if (i === 6) finalLabel = `7. "${dataName}" ${dbSuccess}`;
-                 else if (i === 8) finalLabel = `9. "${dataName}" ${actionWord} işlemi tamamlandı (${httpCode} döndü)`;
+                 else if (i === 5) finalLabel = `6. Özel Alan Servisi "${dataName}" ${dbCheck}`;
+                 else if (i === 6) finalLabel = `7. "${dataName}" ${dbCheckResult}`;
+                 else if (i === 7) finalLabel = `8. Özel Alan Servisi "${dataName}" ${dbAction}`;
+                 else if (i === 8) finalLabel = `9. "${dataName}" ${dbSuccess}`;
+                 else if (i === 10) finalLabel = `11. "${dataName}" ${actionWord} işlemi tamamlandı (${httpCode} döndü)`;
                  else finalLabel = step.label ? step.label.replace(/{DATA}/g, dataName) : '';
              } else {
                  if (labelDataStr.includes('\n')) {
