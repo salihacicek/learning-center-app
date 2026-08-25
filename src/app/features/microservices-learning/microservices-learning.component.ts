@@ -1084,7 +1084,15 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
     }
     
     if (!this.boardWrapper) return;
-    const wrapper = this.boardWrapper.nativeElement;
+        const wrapper = this.boardWrapper.nativeElement;
+    
+    // YENİ ÇÖZÜM: SVG overlay, genişliğiyle kutuyu esnetmesin diye ölçümden önce sıfırlıyoruz.
+    const svgOverlay = wrapper.querySelector('.schema-svg-overlay');
+    if (svgOverlay) {
+       svgOverlay.style.width = '100%';
+       svgOverlay.style.height = '100%';
+    }
+    
     this.svgWidth = wrapper.scrollWidth;
     this.svgHeight = wrapper.scrollHeight;
     const wrapperRect = wrapper.getBoundingClientRect();
