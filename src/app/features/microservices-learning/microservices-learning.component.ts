@@ -1358,84 +1358,106 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       const isAdjacent = !isSameColumn;
       const isReturn = step.isReturn || false;
 
-      // 1. Aynı Kolon veya Alt Alta (dx küçük)
-      if (isSameColumn) {
-        if (isReturn) {
-          // Sol taraftan bracket ([) çiz
-          x1 = from.left;
-          y1 = fixedY1;
-          x2 = to.left;
-          y2 = fixedY2;
-          
-          let corridorOffset = (loopIndex % 6) * 16;
-          let gutterX = Math.min(from.left, to.left) - 40 - corridorOffset;
-          
-          if (activeFlow.id === 'genel-mimari-advanced' && step.isParallel) {
-             gutterX -= 30; // Paralel geri dönüş okunu biraz daha sola it
+      if (isDrawingBackground) {
+        // ARKA PLAN (Genel Mimari):
+        // 1) Yan yana ve aynı hizada olanlar için düz yatay
+        // 2) Çapraz olanlar için düz çapraz
+        let bgOffset = goingRight ? -12 : 12; 
+        
+        x1 = goingRight ? from.right : from.left;
+        y1 = from.centerY + bgOffset;
+        x2 = goingRight ? to.left : to.right;
+        y2 = to.centerY + bgOffset;
+        
+        pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+        labelX = (x1 + x2) / 2;
+        labelY = (y1 + y2) / 2;
+        labelAlign = 'center';
+      } else {
+        // AKTİF AKIŞ YOL HARİTASI (Asla Bozulmamalı)
+        // 1. Aynı Kolon veya Alt Alta (dx küçük)
+        if (isSameColumn) {
+          if (isReturn) {
+            // Sol taraftan bracket ([) çiz
+            x1 = from.left;
+            y1 = fixedY1;
+            x2 = to.left;
+            y2 = fixedY2;
+            
+            let corridorOffset = (loopIndex % 6) * 16;
+            let gutterX = Math.min(from.left, to.left) - 40 - corridorOffset;
+            
+            if (activeFlow.id === 'genel-mimari-advanced' && step.isParallel) {
+               gutterX -= 30; // Paralel geri dönüş okunu biraz daha sola it
+            }
+            
+            pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
+            labelX = gutterX;
+            labelY = (y1 + y2) / 2;
+            labelAlign = 'right';
+          } else {
+            // Sağ taraftan bracket (]) çiz
+            x1 = from.right;
+            y1 = fixedY1;
+            x2 = to.right;
+            y2 = fixedY2;
+            
+            let corridorOffset = (loopIndex % 6) * 16;
+            let gutterX = Math.max(from.right, to.right) + 40 + corridorOffset;
+            
+            pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
+            labelX = gutterX;
+            labelY = (y1 + y2) / 2;
+            labelAlign = 'left';
           }
-          
-          pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
-          labelX = gutterX;
-          labelY = (y1 + y2) / 2;
-          labelAlign = 'right';
-        } else {
-          // Sağ taraftan bracket (]) çiz
-          x1 = from.right;
+  
+        // 1. Uzak Sütun Atlamaları (Geri Dönüşler - Gateway atlama vb.)
+        } else if (Math.abs(dx) > 400 && isReturn && from.left > to.right) {
+          x1 = from.left;
           y1 = fixedY1;
           x2 = to.right;
           y2 = fixedY2;
           
-          let corridorOffset = (loopIndex % 6) * 16;
-          const gutterX = Math.max(from.right, to.right) + 40 + corridorOffset;
+          let bottomY = Math.max(from.bottom, to.bottom) + 40;
+          pathD = `M ${x1} ${y1} L ${x1 - 30} ${y1} L ${x1 - 30} ${bottomY} L ${x2 + 30} ${bottomY} L ${x2 + 30} ${y2} L ${x2} ${y2}`;
+          labelX = (x1 + x2) / 2;
+          labelY = bottomY;
+          labelAlign = 'center';
           
-          pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
-          labelX = gutterX;
+        // 2. Yan Yana Kolonlar (Yatay Bağlantı)
+        } else if (isAdjacent && Math.abs(dy) < 150) {
+          let yOffset = goingRight ? -15 : 15;
+          let adjFixedY1 = from.centerY + yOffset;
+          let adjFixedY2 = to.centerY + yOffset;
+  
+          x1 = goingRight ? from.right : from.left;
+          y1 = adjFixedY1;
+          x2 = goingRight ? to.left : to.right;
+          y2 = adjFixedY2;
+          
+          const midX = (from.centerX + to.centerX) / 2;
+          pathD = `M ${x1} ${adjFixedY1} L ${midX} ${adjFixedY1} L ${midX} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
+          labelX = midX;
+          labelY = adjFixedY1 - 10;
+          
+        // 3. Uzak Kolonlar veya Çapraz/Wrap bağlantılar (Satır atlayanlar)
+        } else {
+          let adjFixedY1 = fixedY1;
+          let adjFixedY2 = fixedY2;
+  
+          x1 = goingRight ? from.right : from.left;
+          y1 = adjFixedY1;
+          x2 = goingRight ? to.left : to.right;
+          y2 = adjFixedY2;
+          
+          let laneOffset = ((loopIndex % 4) - 1.5) * 16;
+          let midX = ((from.centerX + to.centerX) / 2) + laneOffset;
+          pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
+          labelX = midX;
           labelY = (y1 + y2) / 2;
           labelAlign = 'left';
         }
-
-      // 2. Yan Yana Kolonlar (Yatay Bağlantı)
-      } else if (isAdjacent && Math.abs(dy) < 150) {
-        let yOffset = goingRight ? -15 : 15;
-        let adjFixedY1 = from.centerY + yOffset;
-        let adjFixedY2 = to.centerY + yOffset;
-
-        x1 = goingRight ? from.right : from.left;
-        y1 = adjFixedY1;
-        x2 = goingRight ? to.left : to.right;
-        y2 = adjFixedY2;
-        
-        const midX = (from.centerX + to.centerX) / 2;
-        pathD = `M ${x1} ${adjFixedY1} L ${midX} ${adjFixedY1} L ${midX} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
-        labelX = midX;
-        labelY = adjFixedY1 - 10;
-        
-      // 3. Uzak Kolonlar veya Çapraz/Wrap bağlantılar (Satır atlayanlar)
-      } else {
-        let adjFixedY1 = fixedY1;
-        let adjFixedY2 = fixedY2;
-
-        // Çapraz veya alt satıra geçişlerde doğrudan orta noktadan (basit Z-şekli) bağla
-        x1 = goingRight ? from.right : from.left;
-        y1 = adjFixedY1;
-        x2 = goingRight ? to.left : to.right;
-        y2 = adjFixedY2;
-        
-        // Gelişmiş mimarinin ana sayfasında (isDrawingBackground) çapraz (direkt) oklar çiz
-        if (isDrawingBackground) {
-           pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
-           labelX = (x1 + x2) / 2;
-           labelY = (y1 + y2) / 2;
-        } else {
-           // Yol haritası kısmında (aktif akış) asla bozulmamalı, köşeli ortogonal kalmalı
-           let laneOffset = ((i % 4) - 1.5) * 16;
-           let midX = ((from.centerX + to.centerX) / 2) + laneOffset;
-           pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
-           labelX = midX;
-           labelY = (y1 + y2) / 2;
-        }
-          labelAlign = 'left';
-        }
+      }
 
       // 3. Adım: Hangi okun hangi renk olacağını ve dönüş mü gidiş mi olduğunu belirle
       let lineColor = this.getLineColor(i);
