@@ -1491,14 +1491,14 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
              ((step.fromNodeId === 'identity-service' && step.toNodeId === 'identity-db') ||
               (step.fromNodeId === 'identity-db' && step.toNodeId === 'identity-service'))) {
              
-             // Kullanıcının isteği: Yukarıdan aşağıya kronolojik (zaman) sırasıyla insin.
-             // Toplam 6 ok var: Step 3, 4, 5, 6, 7, 8 (index olarak 2, 3, 4, 5, 6, 7)
-             if (loopIndex === 2) { yOffset = -35; }       // Step 3 (En üst)
-             else if (loopIndex === 3) { yOffset = -15; }  // Step 4
-             else if (loopIndex === 4) { yOffset = 5; }    // Step 5
-             else if (loopIndex === 5) { yOffset = 25; }   // Step 6
-             else if (loopIndex === 6) { yOffset = 40; }   // Step 7
-             else if (loopIndex === 7) { yOffset = 55; }   // Step 8 (En alttan U şeklinde çıkacak)
+             // 6 okun birbirine girmemesi için baştakiler yukarıdan U çiziyor,
+             // sondakiler aşağıdan U çiziyor, ortadakiler düz geçiyor.
+             if (loopIndex === 2) { yOffset = -45; }       // Step 3 (Üstten dış U)
+             else if (loopIndex === 3) { yOffset = -30; }  // Step 4 (Üstten iç U)
+             else if (loopIndex === 4) { yOffset = -5; }   // Step 5 (Orta üst düz)
+             else if (loopIndex === 5) { yOffset = 20; }   // Step 6 (Orta alt düz)
+             else if (loopIndex === 6) { yOffset = 40; }   // Step 7 (Alttan iç U)
+             else if (loopIndex === 7) { yOffset = 55; }   // Step 8 (Alttan dış U)
              else { yOffset = goingRight ? -12 : 12; } // Fallback
           }
           else if (activeFlow.id === 'crud-flow' && 
@@ -1536,10 +1536,17 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           
           const midX = (from.centerX + to.centerX) / 2;
           
-          if (activeFlow.id === 'register-flow' && loopIndex === 7) {
-             // 6. oku (Step 8) U şeklinde aşağıdan dolaştır ki alan ferahlasın
-             let bottomY = Math.max(from.bottom, to.bottom) + 35; // Kutuların altından dolaş
-             let dirOffset = goingRight ? 15 : -15; // Kutunun DIŞINA doğru (boşluğa) çık
+          if (activeFlow.id === 'register-flow' && (loopIndex === 2 || loopIndex === 3)) {
+             // Step 3 ve Step 4 üstten U çizerek geçsin
+             let topY = Math.min(from.top, to.top) - (loopIndex === 2 ? 65 : 30);
+             let dirOffset = goingRight ? 15 : -15; 
+             pathD = `M ${x1} ${adjFixedY1} L ${x1 + dirOffset} ${adjFixedY1} L ${x1 + dirOffset} ${topY} L ${x2 - dirOffset} ${topY} L ${x2 - dirOffset} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
+             labelX = midX;
+             labelY = topY - 10;
+          } else if (activeFlow.id === 'register-flow' && (loopIndex === 6 || loopIndex === 7)) {
+             // Step 7 ve Step 8 alttan U çizerek geçsin
+             let bottomY = Math.max(from.bottom, to.bottom) + (loopIndex === 7 ? 65 : 30);
+             let dirOffset = goingRight ? 15 : -15; 
              pathD = `M ${x1} ${adjFixedY1} L ${x1 + dirOffset} ${adjFixedY1} L ${x1 + dirOffset} ${bottomY} L ${x2 - dirOffset} ${bottomY} L ${x2 - dirOffset} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
              labelX = midX;
              labelY = bottomY - 10;
