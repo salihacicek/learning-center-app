@@ -121,7 +121,21 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
   
   // YENİ: Token içindeki yazıları satırlara bölme
   currentDataTokenLines() {
-    return (this.currentDataToken || 'Veri').split('\n');
+    const lines = (this.currentDataToken || 'Veri').split('\n');
+    const result = [];
+    const MAX_LEN = 17; // 140px width is roughly 17-18 chars max
+    for (const line of lines) {
+       if (line.length > MAX_LEN) {
+          let currentLine = line;
+          while (currentLine.length > 0) {
+             result.push(currentLine.substring(0, MAX_LEN));
+             currentLine = currentLine.substring(MAX_LEN);
+          }
+       } else {
+          result.push(line);
+       }
+    }
+    return result;
   }
   
   getTokenLineCount() {
