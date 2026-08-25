@@ -1396,9 +1396,9 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
 
       // 2. Yan Yana Kolonlar (Yatay Bağlantı)
       } else if (isAdjacent && Math.abs(dy) < 150) {
-        // Zıt yönlü (gidiş/dönüş) çizgilerin birbirini kesmesini önlemek için dikey ofset (sapma) ekliyoruz.
-        let adjFixedY1 = fixedY1;
-        let adjFixedY2 = fixedY2;
+        let yOffset = goingRight ? -15 : 15;
+        let adjFixedY1 = from.centerY + yOffset;
+        let adjFixedY2 = to.centerY + yOffset;
 
         x1 = goingRight ? from.right : from.left;
         y1 = adjFixedY1;
@@ -1408,19 +1408,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         const midX = (from.centerX + to.centerX) / 2;
         pathD = `M ${x1} ${adjFixedY1} L ${midX} ${adjFixedY1} L ${midX} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
         labelX = midX;
+        labelY = adjFixedY1 - 10;
         
-        const avgLineY = (adjFixedY1 + adjFixedY2) / 2;
-        const avgBoxY = (from.centerY + to.centerY) / 2;
-        let yOffset = 0;
-        if (avgLineY < avgBoxY - 5) {
-           yOffset = -25;
-        } else if (avgLineY > avgBoxY + 5) {
-           yOffset = 25;
-        } else {
-           yOffset = goingRight ? -25 : 25; 
-        }
-        labelY = avgLineY + yOffset;
-
       // 3. Uzak Kolonlar veya Çapraz/Wrap bağlantılar (Satır atlayanlar)
       } else {
         let adjFixedY1 = fixedY1;
@@ -1432,8 +1421,9 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         x2 = goingRight ? to.left : to.right;
         y2 = adjFixedY2;
         
-        // Kutuların arasındaki dikey boşluktan inebilmek için:
-        let midX = (from.centerX + to.centerX) / 2;
+        // Kutuların arasındaki dikey boşluktan inebilmek için (Çizgilerin üst üste binmesini önle):
+        let laneOffset = ((i % 4) - 1.5) * 16;
+        let midX = ((from.centerX + to.centerX) / 2) + laneOffset;
         
         pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
         labelX = midX;
