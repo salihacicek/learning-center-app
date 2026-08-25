@@ -1352,16 +1352,36 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       if (sameBox) return;
 
       if (activeFlow.id === 'register-flow' && loopIndex === 8) {
-         // Step 9 (Identity -> Gateway): Dümdüz bir çizgi yapıyoruz ki ok ucu kırılmasın ve düzgün görünsün
-         x1 = from.left;
-         y1 = from.centerY + 20; // Hafif aşağıdan dümdüz geçsin
-         x2 = to.right + 8; // Kutuya tam değmesin ki ok ucu net anlaşılsın
-         y2 = to.centerY + 20; 
+         // Step 9 (Identity -> Gateway): Ekran boyutuna göre duyarlı çizim
+         const dx9 = to.centerX - from.centerX;
+         const isSameCol9 = Math.abs(dx9) < 200;
          
-         pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
-         labelX = (x1 + x2) / 2;
-         labelY = y1 - 10;
-         labelAlign = 'center';
+         if (isSameCol9) {
+            // Alt alta iseler (mobil/küçük ekran wrap durumu), sol taraftan [ (bracket) çiz
+            x1 = from.left;
+            y1 = from.centerY; // Kutudan tam çıksın, havada durmasın
+            x2 = to.left - 5; // Ok ucu için azıcık pay
+            y2 = to.centerY + 20; 
+            
+            let gutterX = Math.min(from.left, to.left) - 40;
+            
+            pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
+            labelX = gutterX;
+            labelY = (y1 + y2) / 2;
+            labelAlign = 'right';
+         } else {
+            // Yan yana iseler (geniş ekran)
+            x1 = from.left;
+            y1 = from.centerY + 20; 
+            x2 = to.right + 10; 
+            y2 = to.centerY + 20; 
+            
+            let customMidX = (x1 + x2) / 2;
+            pathD = `M ${x1} ${y1} L ${customMidX} ${y1} L ${customMidX} ${y2} L ${x2} ${y2}`;
+            labelX = customMidX;
+            labelY = ((y1 + y2) / 2) - 15;
+            labelAlign = 'center';
+         }
       } else {
 
       // ── ORTOGONAL (GUTTER) ROUTING ALGORİTMASI ──
