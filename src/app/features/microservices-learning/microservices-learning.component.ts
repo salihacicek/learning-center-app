@@ -1474,10 +1474,10 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
              
              // Kullanıcının isteği: Yukarıdan aşağıya kronolojik (zaman) sırasıyla insin.
              // Toplam 4 ok var: Step 3, 4, 5, 6 (index olarak 2, 3, 4, 5)
-             if (loopIndex === 2) { yOffset = -42; }       // Step 3 (En üst)
-             else if (loopIndex === 3) { yOffset = -14; }  // Step 4 (Altında)
-             else if (loopIndex === 4) { yOffset = 14; }   // Step 5 (Onun altında)
-             else if (loopIndex === 5) { yOffset = 42; }   // Step 6 (En alt)
+             if (loopIndex === 2) { yOffset = -30; }       // Step 3 (En üst)
+             else if (loopIndex === 3) { yOffset = 0; }    // Step 4 (Orta)
+             else if (loopIndex === 4) { yOffset = 30; }   // Step 5 (Alt)
+             else if (loopIndex === 5) { yOffset = 40; }   // Step 6 (En alttan U şeklinde çıkacak)
              else { yOffset = goingRight ? -12 : 12; } // Fallback
           }
           else if (activeFlow.id === 'register-flow') {
@@ -1500,9 +1500,18 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           y2 = adjFixedY2;
           
           const midX = (from.centerX + to.centerX) / 2;
-          pathD = `M ${x1} ${adjFixedY1} L ${midX} ${adjFixedY1} L ${midX} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
-          labelX = midX;
-          labelY = adjFixedY1 - 10;
+          
+          if (activeFlow.id === 'register-flow' && loopIndex === 5) {
+             // 4. oku (Step 6) U şeklinde aşağıdan dolaştır ki alan ferahlasın
+             let bottomY = Math.max(from.bottom, to.bottom) + 35; // Kutuların altından dolaş
+             pathD = `M ${x1} ${adjFixedY1} L ${x1 - 15} ${adjFixedY1} L ${x1 - 15} ${bottomY} L ${x2 + 15} ${bottomY} L ${x2 + 15} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
+             labelX = midX;
+             labelY = bottomY - 10;
+          } else {
+             pathD = `M ${x1} ${adjFixedY1} L ${midX} ${adjFixedY1} L ${midX} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
+             labelX = midX;
+             labelY = adjFixedY1 - 10;
+          }
           
         // 3. Uzak Kolonlar veya Çapraz/Wrap bağlantılar (Satır atlayanlar)
         } else {
