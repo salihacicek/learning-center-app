@@ -312,7 +312,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
          this.scrollToBottom(); // scroll page to input
          return;
       } else {
-         if (this.pendingFlow === 'login-flow') {
+         if (this.pendingFlow === 'login-flow' || this.pendingFlow === 'giris-yap') {
             this.activePrompt.set({
                step: 'input2',
                prefix: 'Şifreniz:',
@@ -356,7 +356,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
          this.consoleInput = '';
          this.scrollToBottom();
          return;
-      } else if (this.pendingFlow === 'login-flow') {
+      } else if (this.pendingFlow === 'login-flow' || this.pendingFlow === 'giris-yap') {
          // Login-flow için input2'de şifre aldık, artık birleştirip çalıştırabiliriz
          const combined = `Ad: ${prompt.action}\nŞifre: ${finalData}`;
          this.executeFlowWithParam(this.pendingFlow!, combined);
