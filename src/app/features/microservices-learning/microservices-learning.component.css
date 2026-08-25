@@ -1445,7 +1445,7 @@
   border-top: 1px solid #e2e8f0;
   overflow: hidden;
   font-family: monospace;
-  margin-top: 20px; /* Mimari ile arasına mesafe daraltıldı */
+  margin-top: auto; /* Konsolu ekranın en altına itmek için auto kullanıyoruz */
 }
 :host-context(.dark-theme) .learning-console,
 .dark-theme .learning-console {
@@ -1635,3 +1635,4 @@
 .text-label.align-center {
   transform: translate(-50%, -50%) !important;
 }
+\n\n/* Şema ile konsol arasına her durumda minimum boşluk bırak */\n.schema-container {\n  padding-bottom: 40px;\n  flex: 1; /* Ortadaki şema kısmının kalan tüm alanı kaplamasını sağlar, böylece konsol en alta itilir */\n}\n
