@@ -1467,15 +1467,29 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           let gap = 20;
           
           // Sadece kayıt kısmında okların arasını hafif daha aç ki yazılar üst üste binmesin
-          // Ancak okların kutuya denk gelmesi için gap = 28 olarak sınırlandırdık (-12 ve -40 = kutu sınırında)
-          if (activeFlow.id === 'register-flow') {
-             yOffset = goingRight ? -12 : 12;
-             gap = 28; 
+          // Ancak okların kutuya denk gelmesi için gap = 28 olarak sınırlandırdık
+          if (activeFlow.id === 'register-flow' && 
+             ((step.fromNodeId === 'identity-service' && step.toNodeId === 'identity-db') ||
+              (step.fromNodeId === 'identity-db' && step.toNodeId === 'identity-service'))) {
+             
+             // Kullanıcının isteği: Yukarıdan aşağıya kronolojik (zaman) sırasıyla insin.
+             // Toplam 4 ok var: Step 3, 4, 5, 6 (index olarak 2, 3, 4, 5)
+             if (loopIndex === 2) { yOffset = -42; }       // Step 3 (En üst)
+             else if (loopIndex === 3) { yOffset = -14; }  // Step 4 (Altında)
+             else if (loopIndex === 4) { yOffset = 14; }   // Step 5 (Onun altında)
+             else if (loopIndex === 5) { yOffset = 42; }   // Step 6 (En alt)
+             else { yOffset = goingRight ? -12 : 12; } // Fallback
           }
-          
-          // Aynı yönde birden fazla ok varsa üst üste binmesin diye ayır
-          let shiftMultiplier = pairIdx;
-          yOffset += (goingRight ? -gap : gap) * shiftMultiplier;
+          else if (activeFlow.id === 'register-flow') {
+             yOffset = goingRight ? -12 : 12;
+             let shiftMultiplier = pairIdx;
+             yOffset += (goingRight ? -28 : 28) * shiftMultiplier;
+          }
+          else {
+             // Diğer yerler için standart hesap
+             let shiftMultiplier = pairIdx;
+             yOffset += (goingRight ? -gap : gap) * shiftMultiplier;
+          }
           
           let adjFixedY1 = from.centerY + yOffset;
           let adjFixedY2 = to.centerY + yOffset;
