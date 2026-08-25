@@ -39,13 +39,16 @@ export const ADVANCED_FLOWS: FlowPath[] = [
   {
     id: 'genel-mimari-advanced',
     name: 'Gelişmiş Mimari Genel Yapı',
-    steps: [
-      { fromNodeId: 'client-node', toNodeId: 'gateway-node', label: '1. Çoklu Kullanıcı İstekleri Gelir' },
-      { fromNodeId: 'gateway-node', toNodeId: 'identity-service', parallelNodeFrom: 'gateway-node', parallelNodeTo: 'crud-service', label: '2. Gateway İstekleri Dağıtır' },
-      { fromNodeId: 'identity-service', toNodeId: 'identity-db', parallelNodeFrom: 'crud-service', parallelNodeTo: 'crud-db', label: '3. Servisler Veritabanlarına Bağlanır' },
-      { fromNodeId: 'identity-db', toNodeId: 'identity-service', parallelNodeFrom: 'crud-db', parallelNodeTo: 'crud-service', label: '4. İşlemler Gerçekleşir', isReturn: true },
-      { fromNodeId: 'identity-service', toNodeId: 'gateway-node', parallelNodeFrom: 'crud-service', parallelNodeTo: 'gateway-node', label: '5. Sonuçlar Gateway\'de Toplanır', isReturn: true },
-      { fromNodeId: 'gateway-node', toNodeId: 'client-node', label: '6. Yanıtlar Kullanıcıya İletilir', isReturn: true }
+        steps: [
+      { fromNodeId: 'client-node', toNodeId: 'gateway-node', label: '1. "{DATA}" isteği gönderilir', dtoName: 'Token + DataDTO' },
+      { fromNodeId: 'gateway-node', toNodeId: 'identity-service', label: '2. Gateway, kimlik doğrulama için tüm isteği Kimlik Servisine yollar', dtoName: 'Token + DataDTO' },
+      { fromNodeId: 'identity-service', toNodeId: 'identity-db', label: '3. Kimlik Servisi yetki ve oturum durumunu DB\'den kontrol eder' },
+      { fromNodeId: 'identity-db', toNodeId: 'identity-service', label: '4. DB onayı: Kullanıcı aktif ve yetkili', isReturn: true },
+      { fromNodeId: 'identity-service', toNodeId: 'crud-service', label: '5. Kimlik doğrulandı, istek doğrudan Özel Alan Servisine aktarılır', dtoName: 'DataDTO' },
+      { fromNodeId: 'crud-service', toNodeId: 'crud-db', label: '6. Özel Alan Servisi "{DATA}" işlemini DB\'de uygular', dtoName: 'Entity' },
+      { fromNodeId: 'crud-db', toNodeId: 'crud-service', label: '7. "{DATA}" işlemi DB\'de başarıyla tamamlandı', isReturn: true },
+      { fromNodeId: 'crud-service', toNodeId: 'gateway-node', label: '8. İşlem sonucu Gateway\'e iletilir', isReturn: true, dtoName: 'SuccessDTO' },
+      { fromNodeId: 'gateway-node', toNodeId: 'client-node', label: '9. "{DATA}" işlemi tamamlandı (200 OK döndü)', isReturn: true, dtoName: 'SuccessDTO' }
     ]
   },
   {
@@ -65,15 +68,14 @@ export const ADVANCED_FLOWS: FlowPath[] = [
     name: '2. CRUD İşlemi Akışı (Authorization - Yetkilendirme İşlemi)',
     steps: [
       { fromNodeId: 'client-node', toNodeId: 'gateway-node', label: '1. "{DATA}" isteği gönderilir', dtoName: 'Token + DataDTO' },
-      { fromNodeId: 'gateway-node', toNodeId: 'identity-service', label: '2. Gateway, Token\'ı doğrulamak için Kimlik Servisine sorar', dtoName: 'Token' },
-      { fromNodeId: 'identity-service', toNodeId: 'identity-db', label: '3. Kimlik Servisi yetki ve oturum durumunu DB\'den kontrol eder' },
+      { fromNodeId: 'gateway-node', toNodeId: 'identity-service', label: '2. Gateway, doğrulamak için isteği Kimlik Servisine iletir', dtoName: 'Token + DataDTO' },
+      { fromNodeId: 'identity-service', toNodeId: 'identity-db', label: '3. Kimlik Servisi yetki durumunu DB\'den kontrol eder' },
       { fromNodeId: 'identity-db', toNodeId: 'identity-service', label: '4. DB onayı: Kullanıcı aktif ve yetkili', isReturn: true },
-      { fromNodeId: 'identity-service', toNodeId: 'gateway-node', label: '5. Kimlik Servisi yetkiyi Gateway\'e bildirir', isReturn: true, dtoName: 'Auth Result' },
-      { fromNodeId: 'gateway-node', toNodeId: 'crud-service', label: '6. Yetki onaylandıktan sonra istek Özel Alan Servisine iletilir', dtoName: 'DataDTO' },
-      { fromNodeId: 'crud-service', toNodeId: 'crud-db', label: '7. Özel Alan Servisi "{DATA}" işlemini DB\'de uygular', dtoName: 'Entity' },
-      { fromNodeId: 'crud-db', toNodeId: 'crud-service', label: '8. "{DATA}" işlemi DB\'de başarıyla tamamlandı', isReturn: true },
-      { fromNodeId: 'crud-service', toNodeId: 'gateway-node', label: '9. İşlem sonucu Gateway\'e iletilir', isReturn: true, dtoName: 'SuccessDTO' },
-      { fromNodeId: 'gateway-node', toNodeId: 'client-node', label: '10. "{DATA}" işlemi tamamlandı (200 OK döndü)', isReturn: true, dtoName: 'SuccessDTO' }
+      { fromNodeId: 'identity-service', toNodeId: 'crud-service', label: '5. Kimlik doğrulandı, istek doğrudan Özel Alan Servisine aktarılır', dtoName: 'DataDTO' },
+      { fromNodeId: 'crud-service', toNodeId: 'crud-db', label: '6. Özel Alan Servisi "{DATA}" işlemini DB\'de uygular', dtoName: 'Entity' },
+      { fromNodeId: 'crud-db', toNodeId: 'crud-service', label: '7. "{DATA}" işlemi DB\'de başarıyla tamamlandı', isReturn: true },
+      { fromNodeId: 'crud-service', toNodeId: 'gateway-node', label: '8. İşlem sonucu Gateway\'e iletilir', isReturn: true, dtoName: 'SuccessDTO' },
+      { fromNodeId: 'gateway-node', toNodeId: 'client-node', label: '9. "{DATA}" işlemi tamamlandı (200 OK döndü)', isReturn: true, dtoName: 'SuccessDTO' }
     ]
   },
   {
