@@ -1540,10 +1540,22 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           
           let laneOffset = ((loopIndex % 4) - 1.5) * 16;
           let midX = ((from.centerX + to.centerX) / 2) + laneOffset;
-          pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
-          labelX = midX;
-          labelY = (y1 + y2) / 2;
-          labelAlign = 'left';
+          if (activeFlow.id === 'register-flow' && loopIndex === 6) {
+             x1 = from.left;
+             y1 = from.centerY + 10;
+             x2 = to.right;
+             y2 = to.centerY + 10;
+             let customMidX = (x1 + x2) / 2;
+             pathD = `M ${x1} ${y1} L ${customMidX} ${y1} L ${customMidX} ${y2} L ${x2} ${y2}`;
+             labelX = customMidX;
+             labelY = (y1 + y2) / 2;
+             labelAlign = 'left';
+          } else {
+             pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
+             labelX = midX;
+             labelY = (y1 + y2) / 2;
+             labelAlign = 'left';
+          }
         }
       }
 
