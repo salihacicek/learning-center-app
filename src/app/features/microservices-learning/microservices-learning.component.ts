@@ -1351,6 +1351,25 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       const sameBox = Math.abs(dx) < 10 && Math.abs(dy) < 10;
       if (sameBox) return;
 
+      if (activeFlow.id === 'register-flow' && loopIndex === 6) {
+         // Step 7 Özel Manuel Çizim:
+         // - "Havada asılı" kalmayı önlemek için y1 = from.centerY + 10 olarak garanti altına alınır.
+         // - x1 = from.left, yani tam kutunun sol kenarı.
+         // - Label'ın Step 8 (Sarı Ok) ile çakışmasını önlemek için labelY'yi biraz aşağıya ( + 30px ) iteriz.
+         x1 = from.left;
+         y1 = from.centerY + 10;
+         x2 = to.left;
+         y2 = to.centerY + 25;
+         
+         let corridorOffset = 20;
+         let gutterX = Math.min(from.left, to.left) - 45 - corridorOffset;
+         
+         pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
+         labelX = gutterX;
+         labelY = ((y1 + y2) / 2) + 30; // Çakışmayı önlemek için aşağıya itme
+         labelAlign = 'right';
+      } else {
+
       // ── ORTOGONAL (GUTTER) ROUTING ALGORİTMASI ──
       // Kutu içinden geçmeleri %100 engellemek için sadece YAN kenarları kullanıyoruz.
 
@@ -1558,6 +1577,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           }
         }
       }
+      } // End of else block for manual override
 
       // 3. Adım: Hangi okun hangi renk olacağını ve dönüş mü gidiş mi olduğunu belirle
       let lineColor = this.getLineColor(i);
