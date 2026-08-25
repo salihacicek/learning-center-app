@@ -81,12 +81,14 @@ export const ADVANCED_FLOWS: FlowPath[] = [
     steps: [
       { fromNodeId: 'client-node', toNodeId: 'gateway-node', label: '1. "{DATA}" kayıt bilgilerini gönderir', dtoName: 'RegisterDTO' },
       { fromNodeId: 'gateway-node', toNodeId: 'identity-service', label: '2. Gateway, Kayıt isteğini Kimlik Servisine iletir', dtoName: 'RegisterDTO' },
-      { fromNodeId: 'identity-service', toNodeId: 'identity-db', label: '3. Şifre hash\'lenir ve Yeni Kullanıcı DB\'ye kaydedilir' },
-      { fromNodeId: 'identity-db', toNodeId: 'identity-service', label: '4. Kullanıcı başarıyla oluşturuldu', isReturn: true },
-      { fromNodeId: 'identity-service', toNodeId: 'identity-db', label: '5. Kullanıcıya varsayılan \'USER\' rolü atanır ve DB\'ye kaydedilir' },
-      { fromNodeId: 'identity-db', toNodeId: 'identity-service', label: '6. Rol ataması başarılı', isReturn: true },
-      { fromNodeId: 'identity-service', toNodeId: 'gateway-node', label: '7. Kayıt işlemi tamamlandı, sonuç Gateway\'e iletilir', isReturn: true, dtoName: 'UserResponseDTO' },
-      { fromNodeId: 'gateway-node', toNodeId: 'client-node', label: '8. "{DATA}" kaydı başarıyla tamamlandı (201 Created)', isReturn: true, dtoName: 'UserResponseDTO' }
+      { fromNodeId: 'identity-service', toNodeId: 'identity-db', label: '3. Kullanıcı daha önce kayıtlı mı diye kontrol edilir' },
+      { fromNodeId: 'identity-db', toNodeId: 'identity-service', label: '4. Kullanıcı bulunamadı (Kayıt yapılabilir)', isReturn: true },
+      { fromNodeId: 'identity-service', toNodeId: 'identity-db', label: '5. Şifre hash\'lenir ve Yeni Kullanıcı DB\'ye kaydedilir' },
+      { fromNodeId: 'identity-db', toNodeId: 'identity-service', label: '6. Kullanıcı başarıyla oluşturuldu', isReturn: true },
+      { fromNodeId: 'identity-service', toNodeId: 'identity-db', label: '7. Kullanıcıya varsayılan \'USER\' rolü atanır ve DB\'ye kaydedilir' },
+      { fromNodeId: 'identity-db', toNodeId: 'identity-service', label: '8. Rol ataması başarılı', isReturn: true },
+      { fromNodeId: 'identity-service', toNodeId: 'gateway-node', label: '9. Kayıt işlemi tamamlandı, sonuç Gateway\'e iletilir', isReturn: true, dtoName: 'UserResponseDTO' },
+      { fromNodeId: 'gateway-node', toNodeId: 'client-node', label: '10. "{DATA}" kaydı başarıyla tamamlandı (201 Created)', isReturn: true, dtoName: 'UserResponseDTO' }
     ]
   }
 ];

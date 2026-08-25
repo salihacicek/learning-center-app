@@ -1351,8 +1351,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
       const sameBox = Math.abs(dx) < 10 && Math.abs(dy) < 10;
       if (sameBox) return;
 
-      if (activeFlow.id === 'register-flow' && loopIndex === 6) {
-         // Step 7 Özel Manuel Çizim:
+      if (activeFlow.id === 'register-flow' && loopIndex === 8) {
+         // Step 9 Özel Manuel Çizim:
          // - "Havada asılı" kalmayı önlemek için y1 = from.centerY + 10 olarak garanti altına alınır.
          // - x1 = from.left, yani tam kutunun sol kenarı.
          // - Label'ın Step 8 (Sarı Ok) ile çakışmasını önlemek için labelY'yi biraz aşağıya ( + 30px ) iteriz.
@@ -1492,11 +1492,13 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
               (step.fromNodeId === 'identity-db' && step.toNodeId === 'identity-service'))) {
              
              // Kullanıcının isteği: Yukarıdan aşağıya kronolojik (zaman) sırasıyla insin.
-             // Toplam 4 ok var: Step 3, 4, 5, 6 (index olarak 2, 3, 4, 5)
-             if (loopIndex === 2) { yOffset = -30; }       // Step 3 (En üst)
-             else if (loopIndex === 3) { yOffset = 0; }    // Step 4 (Orta)
-             else if (loopIndex === 4) { yOffset = 30; }   // Step 5 (Alt)
-             else if (loopIndex === 5) { yOffset = 40; }   // Step 6 (En alttan U şeklinde çıkacak)
+             // Toplam 6 ok var: Step 3, 4, 5, 6, 7, 8 (index olarak 2, 3, 4, 5, 6, 7)
+             if (loopIndex === 2) { yOffset = -35; }       // Step 3 (En üst)
+             else if (loopIndex === 3) { yOffset = -15; }  // Step 4
+             else if (loopIndex === 4) { yOffset = 5; }    // Step 5
+             else if (loopIndex === 5) { yOffset = 25; }   // Step 6
+             else if (loopIndex === 6) { yOffset = 40; }   // Step 7
+             else if (loopIndex === 7) { yOffset = 55; }   // Step 8 (En alttan U şeklinde çıkacak)
              else { yOffset = goingRight ? -12 : 12; } // Fallback
           }
           else if (activeFlow.id === 'crud-flow' && 
@@ -1534,8 +1536,8 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           
           const midX = (from.centerX + to.centerX) / 2;
           
-          if (activeFlow.id === 'register-flow' && loopIndex === 5) {
-             // 4. oku (Step 6) U şeklinde aşağıdan dolaştır ki alan ferahlasın
+          if (activeFlow.id === 'register-flow' && loopIndex === 7) {
+             // 6. oku (Step 8) U şeklinde aşağıdan dolaştır ki alan ferahlasın
              let bottomY = Math.max(from.bottom, to.bottom) + 35; // Kutuların altından dolaş
              let dirOffset = goingRight ? 15 : -15; // Kutunun DIŞINA doğru (boşluğa) çık
              pathD = `M ${x1} ${adjFixedY1} L ${x1 + dirOffset} ${adjFixedY1} L ${x1 + dirOffset} ${bottomY} L ${x2 - dirOffset} ${bottomY} L ${x2 - dirOffset} ${adjFixedY2} L ${x2} ${adjFixedY2}`;
@@ -1559,22 +1561,10 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
           
           let laneOffset = ((loopIndex % 4) - 1.5) * 16;
           let midX = ((from.centerX + to.centerX) / 2) + laneOffset;
-          if (activeFlow.id === 'register-flow' && loopIndex === 6) {
-             x1 = from.left;
-             y1 = from.centerY + 10;
-             x2 = to.right;
-             y2 = to.centerY + 10;
-             let customMidX = (x1 + x2) / 2;
-             pathD = `M ${x1} ${y1} L ${customMidX} ${y1} L ${customMidX} ${y2} L ${x2} ${y2}`;
-             labelX = customMidX;
-             labelY = (y1 + y2) / 2;
-             labelAlign = 'left';
-          } else {
-             pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
-             labelX = midX;
-             labelY = (y1 + y2) / 2;
-             labelAlign = 'left';
-          }
+          pathD = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
+          labelX = midX;
+          labelY = (y1 + y2) / 2;
+          labelAlign = 'left';
         }
       }
       } // End of else block for manual override
