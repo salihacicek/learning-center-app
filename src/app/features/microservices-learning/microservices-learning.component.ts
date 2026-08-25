@@ -1357,18 +1357,16 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
          const isSameCol9 = Math.abs(dx9) < 200;
          
          if (isSameCol9) {
-            // Alt alta iseler (mobil/küçük ekran wrap durumu), sol taraftan [ (bracket) çiz
-            x1 = from.left;
-            y1 = from.centerY; // Kutudan tam çıksın, havada durmasın
-            x2 = to.left - 5; // Ok ucu için azıcık pay
-            y2 = to.centerY + 20; 
+            // Alt alta iseler (mobil/küçük ekran wrap durumu): Aşağıdan yukarıya düz dikey çizgi
+            x1 = from.centerX;
+            y1 = from.top - 5;
+            x2 = to.centerX;
+            y2 = to.bottom + 15; // Ok ucu Gateway'in altında tam görünsün
             
-            let gutterX = Math.min(from.left, to.left) - 40;
-            
-            pathD = `M ${x1} ${y1} L ${gutterX} ${y1} L ${gutterX} ${y2} L ${x2} ${y2}`;
-            labelX = gutterX;
+            pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
+            labelX = x1 + 20; // Çizginin sağ tarafı
             labelY = (y1 + y2) / 2;
-            labelAlign = 'right';
+            labelAlign = 'left'; // Sola hizalı ki metin sağa doğru aksın
          } else {
             // Yan yana iseler (geniş ekran)
             x1 = from.left;
