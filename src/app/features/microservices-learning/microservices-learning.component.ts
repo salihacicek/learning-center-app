@@ -1364,7 +1364,20 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
         // 1. "fixedY1" ve "fixedY2" kullanarak Kimlik ve Özel Alan bağlantılarını Gateway'in üst ve alt kısımlarına dağıtıyoruz.
         // 2. Gidiş ve dönüş çizgilerini birbirinden ayırmak için (yOffset) uyguluyoruz.
         
-        let yOffset = goingRight ? -15 : 15; // Çizgiler arası mesafeyi açtık (-15 ve +15 = 30px fark)
+        // Kullanıcının çizdiği yönlere birebir uyması için dinamik offset:
+        let yOffset = 0;
+        // Eğer bağlantı yukarıdaki servisle (Kimlik) yapılıyorsa:
+        const isTargetAbove = goingRight ? to.centerY < from.centerY - 20 : from.centerY < to.centerY - 20;
+        
+        if (isTargetAbove) {
+            // Gateway <-> Kimlik (Üst servis)
+            // Çizime göre: Sola giden (dönüş) ÜSTTE, Sağa giden (gidiş) ALTTA
+            yOffset = goingRight ? 15 : -15;
+        } else {
+            // Gateway <-> Özel Alan (Alt servis) veya Yatay (Gateway <-> Client)
+            // Çizime göre: Sağa giden (gidiş) ÜSTTE, Sola giden (dönüş) ALTTA
+            yOffset = goingRight ? -15 : 15;
+        }
         
         x1 = goingRight ? from.right : from.left;
         y1 = fixedY1 + yOffset;
