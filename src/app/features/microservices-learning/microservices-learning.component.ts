@@ -1365,7 +1365,7 @@ export class MicroservicesLearningComponent implements OnDestroy, AfterViewCheck
             
             pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
             labelX = x1 + 20; // Çizginin sağ tarafı
-            labelY = (y1 + y2) / 2;
+            labelY = ((y1 + y2) / 2) - 45; // Step 2 (kırmızı) ile çakışmayı önlemek için yukarı
             labelAlign = 'left'; // Sola hizalı ki metin sağa doğru aksın
          } else {
             // Yan yana iseler (geniş ekran)
