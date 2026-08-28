@@ -1635,4 +1635,10 @@
 .text-label.align-center {
   transform: translate(-50%, -50%) !important;
 }
-\n\n/* Şema ile konsol arasına her durumda minimum boşluk bırak */\n.schema-container {\n  padding-bottom: 40px;\n  flex: 1; /* Ortadaki şema kısmının kalan tüm alanı kaplamasını sağlar, böylece konsol en alta itilir */\n}\n
+
+
+/* Şema ile konsol arasına her durumda minimum boşluk bırak */
+.schema-container {
+  padding-bottom: 40px;
+  flex: 1; /* Ortadaki şema kısmının kalan tüm alanı kaplamasını sağlar, böylece konsol en alta itilir */
+}
