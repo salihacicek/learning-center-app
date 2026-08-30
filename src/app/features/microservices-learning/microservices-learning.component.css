@@ -1642,3 +1642,16 @@
   padding-bottom: 40px;
   flex: 1; /* Ortadaki şema kısmının kalan tüm alanı kaplamasını sağlar, böylece konsol en alta itilir */
 }
+
+/* MOBİL (RESPONSIVE) DÜZELTMESİ */
+@media (max-width: 1024px) {
+  .board-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+  .schema-board {
+    min-width: 1100px; /* Force minimum width to keep desktop-like layout on mobile and enable panning */
+  }
+}
